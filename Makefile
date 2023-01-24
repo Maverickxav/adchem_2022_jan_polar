@@ -3,6 +3,7 @@ F90 = /usr/local/bin/gfortran
 
 # Put .o and .mod files here:
 OBJDIR = build
+SRCDIR = src
 
 ACDC_DIR=Clusterin_multiple_chem_RICC2
 NAC := $(shell find ${ACDC_DIR}/cluster_chem_* -maxdepth 0 -type d |wc -l|sed 's/ //g')
@@ -11,7 +12,7 @@ CLUSTER_CHEM_NUM := $(shell seq $(NAC))
 # Directories to search files in (in addition to the current one)
 
 # VPATH = $(OBJDIR):chemistry_DMS_HM_20201222:$(ACDC_DIR):$(foreach n,$(CLUSTER_CHEM_NUM),$(ACDC_DIR)/cluster_chem_$(n):)
-VPATH = $(OBJDIR):mcm_PRAMv1_DMS_I2O5:megan:$(foreach n,$(CLUSTER_CHEM_NUM),$(ACDC_DIR)/cluster_chem_$(n):)
+VPATH = $(OBJDIR):src:mcm_PRAMv1_DMS_I2O5:megan:$(foreach n,$(CLUSTER_CHEM_NUM),$(ACDC_DIR)/cluster_chem_$(n):)
 
 # When compiling, search for files in these directories:
 # VPATH = $(OBJDIR): mcm_PRAMv1_DMS megan ACDC_module_ions_2018_08_31 ACDC_module_2016_09_23
