@@ -1,0 +1,146 @@
+Sub SetCanopyChar(canopychar)
+'needleaf forest
+canopychar(1, 1) = 12 'canopy depth
+canopychar(1, 2) = 0.005  ' leaf width
+canopychar(1, 3) = 0.1  'leaf length
+canopychar(1, 4) = 18 ' canopy height
+canopychar(1, 5) = 0.2 ' scattering coefficient for PPFD
+canopychar(1, 6) = 0.8 ' scattering coefficient for near IR
+canopychar(1, 7) = 0.057 ' reflection coefficient for diffuse PPFD
+canopychar(1, 8) = 0.389 ' reflection coefficient for diffuse near IR
+canopychar(1, 9) = 0.85 ' clustering coefficient (accounts for leaf clumping influence on mean projected leaf area in the direction of the suns beam) use 0.85 for default, corn=0.4-0.9; Pine=0.6-1.0; oak=0.53-0.67; tropical rainforest=1.1
+canopychar(1, 10) = 0.95 ' leaf IR emissivity
+canopychar(1, 11) = 1.25 ' leaf stomata and cuticle factor: 1=hypostomatous, 2=amphistomatous, 1.25=hypostomatous but with some transpiration through cuticle
+canopychar(1, 12) = 0.06  ' .06 daytime temperature lapse rate (K m-1)
+canopychar(1, 13) = -0.06  ' -.06 nighttime temperature lapse rate (K m-1)
+canopychar(1, 14) = 700 ' warm (>283K) canopy total humidity change (Pa)
+canopychar(1, 15) = 150 ' cool (>= 283K) canopy total humidity change (Pa)
+canopychar(1, 16) = 0.7 ' Normalized canopy depth where wind is negligible
+
+'mixed forest
+canopychar(2, 1) = 16 'canopy depth
+canopychar(2, 2) = 0.015  ' leaf width
+canopychar(2, 3) = 0.1  'leaf length
+canopychar(2, 4) = 24 ' canopy height
+canopychar(2, 5) = 0.2 ' scattering coefficient for PPFD
+canopychar(2, 6) = 0.8 ' scattering coefficient for near IR
+canopychar(2, 7) = 0.057 ' reflection coefficient for diffuse PPFD
+canopychar(2, 8) = 0.389 ' reflection coefficient for diffuse near IR
+canopychar(2, 9) = 0.87 ' clustering coefficient (accounts for leaf clumping influence on mean projected leaf area in the direction of the suns beam) use 0.85 for default, corn=0.4-0.9; Pine=0.6-1.0; oak=0.53-0.67; tropical rainforest=1.1
+canopychar(2, 10) = 0.95 ' leaf IR emissivity
+canopychar(2, 11) = 1.25 ' leaf stomata and cuticle factor: 1=hypostomatous, 2=amphistomatous, 1.25=hypostomatous but with some transpiration through cuticle
+canopychar(2, 12) = 0.06  ' .06 daytime temperature lapse rate (K m-1)
+canopychar(2, 13) = -0.06  ' -.06 nighttime temperature lapse rate (K m-1)
+canopychar(2, 14) = 700 ' warm (>283K) canopy total humidity change (Pa)
+canopychar(2, 15) = 150 ' cool (>= 283K) canopy total humidity change (Pa)
+canopychar(2, 16) = 0.7 ' Normalized canopy depth where wind is negligible
+
+'broadleaf forest
+canopychar(3, 1) = 16 'canopy depth
+canopychar(3, 2) = 0.05 ' leaf width (m)
+canopychar(3, 3) = 0.1  'leaf length
+canopychar(3, 4) = 24 ' canopy height
+canopychar(3, 5) = 0.2 ' scattering coefficient for PPFD
+canopychar(3, 6) = 0.8 ' scattering coefficient for near IR
+canopychar(3, 7) = 0.057 ' reflection coefficient for diffuse PPFD
+canopychar(3, 8) = 0.389 ' reflection coefficient for diffuse near IR
+canopychar(3, 9) = 0.9 ' clustering coefficient (accounts for leaf clumping influence on mean projected leaf area in the direction of the suns beam) use 0.85 for default, corn=0.4-0.9; Pine=0.6-1.0; oak=0.53-0.67; tropical rainforest=1.1
+canopychar(3, 10) = 0.95 ' leaf IR emissivity
+canopychar(3, 11) = 1.25 ' leaf stomata and cuticle factor: 1=hypostomatous, 2=amphistomatous, 1.25=hypostomatous but with some transpiration through cuticle
+canopychar(3, 12) = 0.06  ' .06 daytime temperature lapse rate (K m-1)
+canopychar(3, 13) = -0.06  ' -.06 nighttime temperature lapse rate (K m-1)
+canopychar(3, 14) = 700 ' warm (>283K) canopy total humidity change (Pa)
+canopychar(3, 15) = 150 ' cool (>= 283K) canopy total humidity change (Pa)
+canopychar(3, 16) = 0.7 ' Normalized canopy depth where wind is negligible
+
+'mixed vegetation
+canopychar(4, 1) = 6 'canopy depth
+canopychar(4, 2) = 0.015 ' leaf width (m)
+canopychar(4, 3) = 0.1  'leaf length
+canopychar(4, 4) = 12 ' canopy height
+canopychar(4, 5) = 0.2 ' scattering coefficient for PPFD
+canopychar(4, 6) = 0.8 ' scattering coefficient for near IR
+canopychar(4, 7) = 0.057 ' reflection coefficient for diffuse PPFD
+canopychar(4, 8) = 0.389 ' reflection coefficient for diffuse near IR
+canopychar(4, 9) = 0.85 ' clustering coefficient (accounts for leaf clumping influence on mean projected leaf area in the direction of the suns beam) use 0.85 for default, corn=0.4-0.9; Pine=0.6-1.0; oak=0.53-0.67; tropical rainforest=1.1
+canopychar(4, 10) = 0.95 ' leaf IR emissivity
+canopychar(4, 11) = 1.25 ' leaf stomata and cuticle factor: 1=hypostomatous, 2=amphistomatous, 1.25=hypostomatous but with some transpiration through cuticle
+canopychar(4, 12) = 0.06  ' .06 daytime temperature lapse rate (K m-1)
+canopychar(4, 13) = -0.06  ' -.06 nighttime temperature lapse rate (K m-1)
+canopychar(4, 14) = 700 ' warm (>283K) canopy total humidity change (Pa)
+canopychar(4, 15) = 150 ' cool (>= 283K) canopy total humidity change (Pa)
+canopychar(4, 16) = 0.7 ' Normalized canopy depth where wind is negligible
+
+'shrubs
+canopychar(5, 1) = 1 'canopy depth
+canopychar(5, 2) = 0.015 ' leaf width (m)
+canopychar(5, 3) = 0.1  'leaf length
+canopychar(5, 4) = 2 ' canopy height
+canopychar(5, 5) = 0.2 ' scattering coefficient for PPFD
+canopychar(5, 6) = 0.8 ' scattering coefficient for near IR
+canopychar(5, 7) = 0.057 ' reflection coefficient for diffuse PPFD
+canopychar(5, 8) = 0.389 ' reflection coefficient for diffuse near IR
+canopychar(5, 9) = 0.85 ' clustering coefficient (accounts for leaf clumping influence on mean projected leaf area in the direction of the suns beam) use 0.85 for default, corn=0.4-0.9; Pine=0.6-1.0; oak=0.53-0.67; tropical rainforest=1.1
+canopychar(5, 10) = 0.95 ' leaf IR emissivity
+canopychar(5, 11) = 1 ' leaf stomata and cuticle factor: 1=hypostomatous, 2=amphistomatous, 1.25=hypostomatous but with some transpiration through cuticle
+canopychar(5, 12) = 0.06  ' .06 daytime temperature lapse rate (K m-1)
+canopychar(5, 13) = -0.06  ' -.06 nighttime temperature lapse rate (K m-1)
+canopychar(5, 14) = 700 ' warm (>283K) canopy total humidity change (Pa)
+canopychar(5, 15) = 150 ' cool (>= 283K) canopy total humidity change (Pa)
+canopychar(5, 16) = 0.7 ' Normalized canopy depth where wind is negligible
+
+'grass
+canopychar(6, 1) = 0.5 'canopy depth
+canopychar(6, 2) = 0.01 ' leaf width (m)
+canopychar(6, 3) = 0.15  'leaf length
+canopychar(6, 4) = 0.5 ' canopy height
+canopychar(6, 5) = 0.2 ' scattering coefficient for PPFD
+canopychar(6, 6) = 0.8 ' scattering coefficient for near IR
+canopychar(6, 7) = 0.057 ' reflection coefficient for diffuse PPFD
+canopychar(6, 8) = 0.389 ' reflection coefficient for diffuse near IR
+canopychar(6, 9) = 0.7 ' clustering coefficient (accounts for leaf clumping influence on mean projected leaf area in the direction of the suns beam) use 0.85 for default, corn=0.4-0.9; Pine=0.6-1.0; oak=0.53-0.67; tropical rainforest=1.1
+canopychar(6, 10) = 0.95 ' leaf IR emissivity
+canopychar(6, 11) = 1.25 ' leaf stomata and cuticle factor: 1=hypostomatous, 2=amphistomatous, 1.25=hypostomatous but with some transpiration through cuticle
+canopychar(6, 12) = 0.06  ' .06 daytime temperature lapse rate (K m-1)
+canopychar(6, 13) = -0.06  ' -.06 nighttime temperature lapse rate (K m-1)
+canopychar(6, 14) = 700 ' warm (>283K) canopy total humidity change (Pa)
+canopychar(6, 15) = 150 ' cool (>= 283K) canopy total humidity change (Pa)
+canopychar(6, 16) = 0.7 ' Normalized canopy depth where wind is negligible
+
+'crop
+canopychar(7, 1) = 1 'canopy depth
+canopychar(7, 2) = 0.02 ' leaf width (m)
+canopychar(7, 3) = 0.15  'leaf length
+canopychar(7, 4) = 1 ' canopy height
+canopychar(7, 5) = 0.2 ' scattering coefficient for PPFD
+canopychar(7, 6) = 0.8 ' scattering coefficient for near IR
+canopychar(7, 7) = 0.057 ' reflection coefficient for diffuse PPFD
+canopychar(7, 8) = 0.389 ' reflection coefficient for diffuse near IR
+canopychar(7, 9) = 0.65 ' clustering coefficient (accounts for leaf clumping influence on mean projected leaf area in the direction of the suns beam) use 0.85 for default, corn=0.4-0.9; Pine=0.6-1.0; oak=0.53-0.67; tropical rainforest=1.1
+canopychar(7, 10) = 0.95 ' leaf IR emissivity
+canopychar(7, 11) = 1.25 ' leaf stomata and cuticle factor: 1=hypostomatous, 2=amphistomatous, 1.25=hypostomatous but with some transpiration through cuticle
+canopychar(7, 12) = 0.06  ' .06 daytime temperature lapse rate (K m-1)
+canopychar(7, 13) = -0.06  ' -.06 nighttime temperature lapse rate (K m-1)
+canopychar(7, 14) = 700 ' warm (>283K) canopy total humidity change (Pa)
+canopychar(7, 15) = 150 ' cool (>= 283K) canopy total humidity change (Pa)
+canopychar(7, 16) = 0.7 ' Normalized canopy depth where wind is negligible
+
+'tropical forest
+canopychar(8, 1) = 16 'canopy depth
+canopychar(8, 2) = 0.05 ' leaf width (m)
+canopychar(8, 3) = 0.1  'leaf length
+canopychar(8, 4) = 24 ' canopy height
+canopychar(8, 5) = 0.2 ' scattering coefficient for PPFD
+canopychar(8, 6) = 0.8 ' scattering coefficient for near IR
+canopychar(8, 7) = 0.057 ' reflection coefficient for diffuse PPFD
+canopychar(8, 8) = 0.389 ' reflection coefficient for diffuse near IR
+canopychar(8, 9) = 1.1 ' clustering coefficient (accounts for leaf clumping influence on mean projected leaf area in the direction of the suns beam) use 0.85 for default, corn=0.4-0.9; Pine=0.6-1.0; oak=0.53-0.67; tropical rainforest=1.1
+canopychar(8, 10) = 0.95 ' leaf IR emissivity
+canopychar(8, 11) = 1.25 ' leaf stomata and cuticle factor: 1=hypostomatous, 2=amphistomatous, 1.25=hypostomatous but with some transpiration through cuticle
+canopychar(8, 12) = 0.06  ' .06 daytime temperature lapse rate (K m-1)
+canopychar(8, 13) = -0.06  ' -.06 nighttime temperature lapse rate (K m-1)
+canopychar(8, 14) = 700 ' warm (>283K) canopy total humidity change (Pa)
+canopychar(8, 15) = 150 ' cool (>= 283K) canopy total humidity change (Pa)
+canopychar(8, 16) = 0.7 ' Normalized canopy depth where wind is negligible
+
+End Sub
