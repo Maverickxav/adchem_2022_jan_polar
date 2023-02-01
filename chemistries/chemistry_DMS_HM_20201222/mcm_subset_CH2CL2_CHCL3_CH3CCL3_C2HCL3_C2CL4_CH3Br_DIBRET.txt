@@ -1,0 +1,220 @@
+{********************************************************************* ;
+* A citation to the MCM website and the relevant mechanism          * ;
+* construction protocols should be given in any publication using   * ;
+* information obtained from this source, using the following or     * ;
+* comparable wording:                                               * ;
+* The chemical mechanistic information was taken from the Master    * ;
+* Chemical Mechanism, MCM v3.3.1 (ref), via website:                  * ;
+* http://mcm.leeds.ac.uk/MCM.                                       * ;
+* The reference should be: (Jenkin et al., Atmos. Environ., 31, 81, * ;
+* 1997; Saunders et al., Atmos. Chem. Phys., 3, 161, 2003), for     * ;
+* non aromatic schemes; (Jenkin et al., Atmos. Chem. Phys., 3,  * ;
+* 181, 2003; Bloss et al., Atmos. Chem. Phys., 5, 641, 2005), for   * ;
+* aromatic schemes; (Jenkin et al., Atmos. Chem. Phys.,  12, * ;
+* 5275, 2012), for the beta-caryophyllene scheme and (Jenkin et al., ;
+* Atmos. Chem. Phys., 15, 11433, 2015), for the isoprene scheme.    * ;
+********************************************************************* ;}
+#INLINE F90_GLOBAL 
+ REAL(dp)::M, N2, O2, RO2, H2O 
+ #ENDINLINE {above lines go into MODULE KPP_ROOT_Global}
+#INCLUDE atoms 
+#DEFVAR
+C2CL32OH = IGNORE ;
+DIBRETOH = IGNORE ;
+C2CL3OHOOH = IGNORE ;
+CCL3O = IGNORE ;
+CCL3CH2OH = IGNORE ;
+CHCL2O = IGNORE ;
+CCL3CHO = IGNORE ;
+TCE2OH = IGNORE ;
+CHCL3 = IGNORE ;
+BR = IGNORE ;
+BRETPAN = IGNORE ;
+DIBRET = IGNORE ;
+TCEOHO2 = IGNORE ;
+NO2 = IGNORE ;
+NO3 = IGNORE ;
+BRETO3H = IGNORE ;
+CH3BR = IGNORE ;
+CCL3CH2O = IGNORE ;
+NO = IGNORE ;
+CHCL2OH = IGNORE ;
+O3 = IGNORE ;
+CL = IGNORE ;
+CHOBR = IGNORE ;
+HO2 = IGNORE ;
+TCEOHOOH = IGNORE ;
+CHCL2OOH = IGNORE ;
+CCL3O2 = IGNORE ;
+TCE = IGNORE ;
+C2CL3OHAO2 = IGNORE ;
+TCEOHO = IGNORE ;
+CCL3CO3 = IGNORE ;
+CH2CL2 = IGNORE ;
+C2CL3OHBO2 = IGNORE ;
+CO = IGNORE ;
+CH2BROOH = IGNORE ;
+COCL2 = IGNORE ;
+CCL2OHCOCL = IGNORE ;
+CCL3OH = IGNORE ;
+HNO3 = IGNORE ;
+CHCL2O2 = IGNORE ;
+BRETO2H = IGNORE ;
+C2CL3HOOOH = IGNORE ;
+CCL3CO3H = IGNORE ;
+CCL3CH2OOH = IGNORE ;
+CCL3PAN = IGNORE ;
+C2CL3OHAO = IGNORE ;
+C2CL3OHBO = IGNORE ;
+DIBRETO2H = IGNORE ;
+CCL3OOH = IGNORE ;
+BRETO3 = IGNORE ;
+OH = IGNORE ;
+CH2BROH = IGNORE ;
+CHOCL = IGNORE ;
+CH2BRO = IGNORE ;
+TRICLETH = IGNORE ;
+CH3CCL3 = IGNORE ;
+CH2BRO2 = IGNORE ;
+BRETAL = IGNORE ;
+DIBRETO = IGNORE ;
+DIBRETO2 = IGNORE ;
+CCL3CH2O2 = IGNORE ;
+{ Peroxy radicals. }
+#INLINE F90_RCONST 
+ USE constants
+ !end of USE statements 
+ !
+ ! start of executable statements
+ RO2 = & 
+ C(ind_CHCL2O2) + C(ind_CCL3O2) + C(ind_CCL3CH2O2) + C(ind_TCEOHO2) + & 
+   C(ind_C2CL3OHAO2) + C(ind_C2CL3OHBO2) + C(ind_CH2BRO2) + &  
+   C(ind_DIBRETO2) + C(ind_CCL3CO3) + C(ind_BRETO3 ) 
+ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O) 
+ #ENDINLINE 
+{above lines go into the SUBROUTINES UPDATE_RCONST and UPDATE_PHOTO}
+#EQUATIONS
+{1.} 	 CH2CL2 + OH = CHCL2O2 : 	6.14D-18*TEMP**2*EXP(-389/TEMP) 	;
+{2.} 	 CHCL3 + OH = CCL3O2 : 	1.80D-18*TEMP**2*EXP(-129/TEMP) 	;
+{3.} 	 CH3CCL3 + OH = CCL3CH2O2 : 	2.25D-18*TEMP**2*EXP(-910/TEMP) 	;
+{4.} 	 TCE + OH = TCEOHO2 : 	3.5D-12*EXP(-920/TEMP) 	;
+{5.} 	 TRICLETH + OH = C2CL3OHAO2 : 	3.0D-13*EXP(565/TEMP)*0.50 	;
+{6.} 	 TRICLETH + OH = C2CL3OHBO2 : 	3.0D-13*EXP(565/TEMP)*0.50 	;
+{7.} 	 CH3BR + OH = CH2BRO2 : 	7.40D-13*EXP(-875/TEMP) 	;
+{8.} 	 DIBRET + OH = DIBRETO2 : 	1.03D-17*TEMP**2*EXP(-422/TEMP) 	;
+{9.} 	 CHCL2O2 + HO2 = CHCL2OOH : 	5.6D-13*EXP(700/TEMP) 	;
+{10.} 	 CHCL2O2 + NO = CHCL2O + NO2 : 	KRO2NO*1.5 	;
+{11.} 	 CHCL2O2 + NO3 = CHCL2O + NO2 : 	KRO2NO3 	;
+{12.} 	 CHCL2O2 = CHCL2O : 	2.00D-12*0.6*RO2 	;
+{13.} 	 CHCL2O2 = CHCL2OH : 	2.00D-12*0.2*RO2 	;
+{14.} 	 CHCL2O2 = COCL2 : 	2.00D-12*0.2*RO2 	;
+{15.} 	 CCL3O2 + HO2 = CCL3OOH : 	4.7D-13*EXP(710/TEMP) 	;
+{16.} 	 CCL3O2 + NO = CCL3O + NO2 : 	KRO2NO*1.8 	;
+{17.} 	 CCL3O2 + NO3 = CCL3O + NO2 : 	KRO2NO3 	;
+{18.} 	 CCL3O2 = CCL3O : 	2*(KCH3O2*3.3D-13*EXP(740/TEMP))**0.5*RO2*0.7 	;
+{19.} 	 CCL3O2 = CCL3OH : 	2*(KCH3O2*3.3D-13*EXP(740/TEMP))**0.5*RO2*0.3 	;
+{20.} 	 CCL3CH2O2 + HO2 = CCL3CH2OOH : 	3.30D-13*EXP(820/TEMP) 	;
+{21.} 	 CCL3CH2O2 + NO = CCL3CH2O + NO2 : 	KRO2NO*1.5 	;
+{22.} 	 CCL3CH2O2 + NO3 = CCL3CH2O + NO2 : 	KRO2NO3 	;
+{23.} 	 CCL3CH2O2 = CCL3CH2O : 	2.00D-12*0.6*RO2 	;
+{24.} 	 CCL3CH2O2 = CCL3CH2OH : 	2.00D-12*0.2*RO2 	;
+{25.} 	 CCL3CH2O2 = CCL3CHO : 	2.00D-12*0.2*RO2 	;
+{26.} 	 TCEOHO2 + HO2 = TCEOHOOH : 	3.30D-13*EXP(820/TEMP) 	;
+{27.} 	 TCEOHO2 + NO = TCEOHO + NO2 : 	KRO2NO*1.5 	;
+{28.} 	 TCEOHO2 + NO3 = TCEOHO + NO2 : 	KRO2NO3 	;
+{29.} 	 TCEOHO2 = TCE2OH : 	9.20D-14*0.3*RO2 	;
+{30.} 	 TCEOHO2 = TCEOHO : 	9.20D-14*0.7*RO2 	;
+{31.} 	 C2CL3OHAO2 + HO2 = C2CL3OHOOH : 	3.30D-13*EXP(820/TEMP) 	;
+{32.} 	 C2CL3OHAO2 + NO = C2CL3OHAO + NO2 : 	KRO2NO*1.5 	;
+{33.} 	 C2CL3OHAO2 + NO3 = C2CL3OHAO + NO2 : 	KRO2NO3 	;
+{34.} 	 C2CL3OHAO2 = C2CL32OH : 	9.20D-14*0.3*RO2 	;
+{35.} 	 C2CL3OHAO2 = C2CL3OHAO : 	9.20D-14*0.7*RO2 	;
+{36.} 	 C2CL3OHBO2 + HO2 = C2CL3HOOOH : 	3.30D-13*EXP(820/TEMP) 	;
+{37.} 	 C2CL3OHBO2 + NO = C2CL3OHBO + NO2 : 	KRO2NO*1.5 	;
+{38.} 	 C2CL3OHBO2 + NO3 = C2CL3OHBO + NO2 : 	KRO2NO3 	;
+{39.} 	 C2CL3OHBO2 = C2CL32OH : 	8.80D-13*0.2*RO2 	;
+{40.} 	 C2CL3OHBO2 = C2CL3OHBO : 	8.80D-13*0.6*RO2 	;
+{41.} 	 C2CL3OHBO2 = CCL2OHCOCL : 	8.80D-13*0.2*RO2 	;
+{42.} 	 CH2BRO2 + HO2 = CH2BROOH : 	4.28D-13*EXP(820/TEMP) 	;
+{43.} 	 CH2BRO2 + NO = CH2BRO + NO2 : 	KRO2NO*1.5 	;
+{44.} 	 CH2BRO2 + NO3 = CH2BRO + NO2 : 	KRO2NO3 	;
+{45.} 	 CH2BRO2 = CH2BRO : 	2.00D-12*0.60*RO2 	;
+{46.} 	 CH2BRO2 = CH2BROH : 	2.00D-12*0.20*RO2 	;
+{47.} 	 CH2BRO2 = CHOBR : 	2.00D-12*0.20*RO2 	;
+{48.} 	 DIBRETO2 + HO2 = DIBRETO2H : 	3.30D-13*EXP(820/TEMP) 	;
+{49.} 	 DIBRETO2 + NO = DIBRETO + NO2 : 	KRO2NO*1.5 	;
+{50.} 	 DIBRETO2 + NO3 = DIBRETO + NO2 : 	KRO2NO3 	;
+{51.} 	 DIBRETO2 = BRETAL : 	8.80D-13*0.2*RO2 	;
+{52.} 	 DIBRETO2 = DIBRETOH : 	8.80D-13*0.6*RO2+8.80D-13*0.2*RO2 	;
+{53.} 	 CHCL2OOH + OH = CHCL2O2 : 	1.90D-12*EXP(190/TEMP) 	;
+{54.} 	 CHCL2OOH + OH = COCL2 + OH : 	3.44D-12 	;
+{55.} 	 CHCL2OOH = CHCL2O + OH : 	J(41) 	;
+{56.} 	 CHCL2O = CHOCL + CL : 	KDEC 	;
+{57.} 	 CHCL2OH + OH = COCL2 + HO2 : 	9.34D-13 	;
+{58.} 	 COCL2 = CO + CL + CL : 	J(15) 	;
+{59.} 	 CCL3OOH + OH = CCL3O2 : 	1.90D-12*EXP(190/TEMP) 	;
+{60.} 	 CCL3OOH = CCL3O + OH : 	J(41) 	;
+{61.} 	 CCL3O = COCL2 + CL : 	KDEC 	;
+{62.} 	 CCL3OH + OH = CCL3O : 	3.60D-14 	;
+{63.} 	 CCL3CH2OOH + OH = CCL3CH2O2 : 	1.90D-12*EXP(190/TEMP) 	;
+{64.} 	 CCL3CH2OOH + OH = CCL3CHO + OH : 	9.80D-13 	;
+{65.} 	 CCL3CH2OOH = CCL3CH2O + OH : 	J(41) 	;
+{66.} 	 CCL3CH2O = CCL3CHO + HO2 : 	KROPRIM*O2 	;
+{67.} 	 CCL3CH2OH + OH = CCL3CHO + HO2 : 	2.56D-12 	;
+{68.} 	 CCL3CHO + NO3 = CCL3CO3 + HNO3 : 	KNO3AL 	;
+{69.} 	 CCL3CHO + OH = CCL3CO3 : 	1.45D-12 	;
+{70.} 	 CCL3CHO = CCL3O2 + HO2 + CO : 	J(11) 	;
+{71.} 	 TCEOHOOH + OH = TCEOHO2 : 	3.63D-12 	;
+{72.} 	 TCEOHOOH = TCEOHO + OH : 	J(41) 	;
+{73.} 	 TCEOHO = COCL2 + COCL2 + HO2 : 	KDEC 	;
+{74.} 	 TCE2OH + OH = TCEOHO : 	7.18D-14 	;
+{75.} 	 C2CL3OHOOH + OH = C2CL3OHAO2 : 	3.84D-12 	;
+{76.} 	 C2CL3OHOOH = C2CL3OHAO + OH : 	J(41) 	;
+{77.} 	 C2CL3OHAO = COCL2 + CHOCL + HO2 : 	KDEC 	;
+{78.} 	 C2CL32OH + OH = CCL2OHCOCL + HO2 : 	2.85D-13 	;
+{79.} 	 C2CL3HOOOH + OH = C2CL3OHBO2 : 	4.44D-12 	;
+{80.} 	 C2CL3HOOOH = C2CL3OHBO + OH : 	J(41) 	;
+{81.} 	 C2CL3OHBO = COCL2 + CHOCL + HO2 : 	KDEC 	;
+{82.} 	 CCL2OHCOCL + OH = COCL2 + CO + CL : 	3.59D-14 	;
+{83.} 	 CCL2OHCOCL = COCL2 + CO + CL + HO2 : 	J(15) 	;
+{84.} 	 CH2BROOH + OH = CH2BRO2 : 	1.90D-12*EXP(190/TEMP) 	;
+{85.} 	 CH2BROOH + OH = CHOBR + OH : 	5.79D-12 	;
+{86.} 	 CH2BROOH = CH2BRO + OH : 	J(41) 	;
+{87.} 	 CH2BRO = CHOBR + HO2 : 	KROPRIM*O2 	;
+{88.} 	 CH2BROH + OH = CHOBR + HO2 : 	1.06D-12 	;
+{89.} 	 CHOBR + NO3 = CO + BR + HNO3 : 	KNO3AL 	;
+{90.} 	 CHOBR + OH = CO + BR : 	1.16D-12 	;
+{91.} 	 CHOBR = HO2 + CO + BR : 	J(11) 	;
+{92.} 	 DIBRETO2H + OH = DIBRETO2 : 	9.52D-12 	;
+{93.} 	 DIBRETO2H = DIBRETO + OH : 	J(41) 	;
+{94.} 	 DIBRETO = BRETAL + BR : 	KDEC 	;
+{95.} 	 BRETAL + NO3 = BRETO3 + HNO3 : 	KNO3AL 	;
+{96.} 	 BRETAL + OH = BRETO3 : 	2.05D-12 	;
+{97.} 	 BRETAL = CH2BRO2 + HO2 + CO : 	J(11) 	;
+{98.} 	 DIBRETOH + OH = DIBRETO : 	2.80D-12 	;
+{99.} 	 CHOCL + NO3 = CO + CL + HNO3 : 	KNO3AL 	;
+{100.} 	 CHOCL + OH = CO + CL : 	6.12D-12 	;
+{101.} 	 CHOCL = HO2 + CO + CL : 	J(11) 	;
+{102.} 	 CCL3CO3 + HO2 = CCL3CO3H : 	KAPHO2*0.56 	;
+{103.} 	 CCL3CO3 + HO2 = CCL3O2 + OH : 	KAPHO2*0.44 	;
+{104.} 	 CCL3CO3 + NO = CCL3O2 + NO2 : 	KAPNO 	;
+{105.} 	 CCL3CO3 + NO2 = CCL3PAN : 	KFPAN 	;
+{106.} 	 CCL3CO3 + NO3 = CCL3O2 + NO2 : 	KRO2NO3*1.74 	;
+{107.} 	 CCL3CO3 = CCL3O2 : 	1.00D-11*RO2 	;
+{108.} 	 BRETO3 + HO2 = BRETO2H + O3 : 	KAPHO2*0.15 	;
+{109.} 	 BRETO3 + HO2 = BRETO3H : 	KAPHO2*0.41 	;
+{110.} 	 BRETO3 + HO2 = CH2BRO2 + OH : 	KAPHO2*0.44 	;
+{111.} 	 BRETO3 + NO = CH2BRO2 + NO2 : 	KAPNO 	;
+{112.} 	 BRETO3 + NO2 = BRETPAN : 	KFPAN 	;
+{113.} 	 BRETO3 + NO3 = CH2BRO2 + NO2 : 	KRO2NO3*1.74 	;
+{114.} 	 BRETO3 = BRETO2H : 	1.00D-11*0.30*RO2 	;
+{115.} 	 BRETO3 = CH2BRO2 : 	1.00D-11*0.70*RO2 	;
+{116.} 	 CCL3CO3H + OH = CCL3CO3 : 	1.90D-12*EXP(190/TEMP) 	;
+{117.} 	 CCL3CO3H = CCL3O2 + OH : 	J(41) 	;
+{118.} 	 CCL3PAN = CCL3CO3 + NO2 : 	KBPAN 	;
+{119.} 	 BRETO2H + OH = CH2BRO2 : 	1.90D-12*EXP(190/TEMP) 	;
+{120.} 	 BRETO3H + OH = BRETO3 : 	3.79D-12 	;
+{121.} 	 BRETO3H = CH2BRO2 + OH : 	J(41) 	;
+{122.} 	 BRETPAN + OH = CHOBR + CO + NO2 : 	5.56D-13 	;
+{123.} 	 BRETPAN = BRETO3 + NO2 : 	KBPAN 	;
+

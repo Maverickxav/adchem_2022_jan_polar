@@ -1090,7 +1090,7 @@ END SUBROUTINE coagulation
 	
 	!!!!!!!!!!!!!!!!!! Condensation !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 SUBROUTINE condensation(N_bins,V_bins,p,T,RH,d_p,dp_dry,aX,MX,qX,dX,dens,corg,cH2SO4,cHNO3,&
-cHCl,cCH3SO3H,cHIO3,cNH3,cDMA,c_p,W,Kprim_HNO3,Kprim_HCl,Kprim_CH3SO3H,Kprim_HIO3,Hprim_NH3,Kprim_NH3,&
+cHCl,cCH3SO3H,cHIO3,cNH3,cDMA,cHIO2,c_p,W,Kprim_HNO3,Kprim_HCl,Kprim_CH3SO3H,Kprim_HIO3,Hprim_NH3,Kprim_NH3,&
 fHSO4,fSO4,fNO3,fCl,fCH3SO3,fHIO3,mHCO3,mCO3,mOH,psat_org,yorg,Dorg,CS_H2SO4,CS_air,c_p_backg,dt,&
  Nconc_evap1, comp_evap, clust_evap, flag_clusterin)    
 
@@ -1104,15 +1104,15 @@ REAL(dp), DIMENSION(NSPEC_P,nr_bins) :: c_p_fixed, c_p_old
 REAL(dp), INTENT(in) :: T,p,RH
 REAL(dp), DIMENSION(NCOND,nr_bins), INTENT(in) :: yorg
 REAL(dp), INTENT(out) :: CS_H2SO4, CS_air
-REAL(dp), INTENT(inout) :: cH2SO4, cHNO3, cNH3, cHCl, cCH3SO3H, cHIO3, cDMA
+REAL(dp), INTENT(inout) :: cH2SO4, cHNO3, cNH3, cHCl, cCH3SO3H, cHIO3, cDMA,cHIO2
 REAL(dp), DIMENSION(NCOND), INTENT(inout) :: corg
 REAL(dp), DIMENSION(NCOND), INTENT(in)    :: psat_org
 REAL(dp), DIMENSION(NSPEC_P), INTENT(in) :: MX,qX,aX,dX
 REAL(dp), DIMENSION(NSPEC_P) :: surf_tens
 REAL(dp), DIMENSION(NSPEC_P,nr_bins) :: S_Kelvin
-REAL(dp) :: aH2SO4,aHNO3,aHCl,aCH3SO3H,aHIO3,aDMA,CH2SO4old,CHNO3old,CHClold,CCH3SO3Hold,CHIO3old,CDMAold,CNH3old,DHNO3,DHCl,DCH3SO3H,DHIO3,DDMA,Dair,DH2SO40,&
-Keq1,Keq2,DH2SO4,mH2SO4,mHNO3,mHCl,mCH3SO3H,mHIO3,mDMA,m_air,speedH2SO4,speedHNO3,speedHCl,speedCH3SO3H,speedHIO3,speedDMA,speedair,CH2SO4sat,&
-CCH3SO3Hsat,CHIO3sat,CDMAsat,CH2SO4m,CHNO3m,CHClm,CCH3SO3Hm,CHIO3m,CDMAm,CNH3m,CH2SO4tot,cNH3tot,CHNO3tot,CHCltot,CCH3SO3Htot,CHIO3tot,CDMAtot,&
+REAL(dp) :: aH2SO4,aHNO3,aHCl,aCH3SO3H,aHIO3,aDMA,aHIO2,CH2SO4old,CHNO3old,CHClold,CCH3SO3Hold,CHIO3old,CDMAold,CNH3old,CHIO2old,DHNO3,DHCl,DCH3SO3H,DHIO3,DHIO2,DDMA,Dair,DH2SO40,&
+Keq1,Keq2,DH2SO4,mH2SO4,mHNO3,mHCl,mCH3SO3H,mHIO3,mDMA,mHIO2,m_air,speedH2SO4,speedHNO3,speedHCl,speedCH3SO3H,speedHIO3,speedHIO2,speedDMA,speedair,CH2SO4sat,&
+CCH3SO3Hsat,CHIO3sat,CDMAsat,CH2SO4m,CHNO3m,CHClm,CCH3SO3Hm,CHIO3m,CHIO2m,CDMAm,CNH3m,CH2SO4tot,cNH3tot,CHNO3tot,CHCltot,CCH3SO3Htot,CHIO3tot,CDMAtot,&
 Corgm,Corgtot, errorCNH3, fn,fprimn, dp_max, r1, r2, l_gas, dyn_visc, d_H2SO4, d_air, dens_air
 
 REAL(dp), DIMENSION(NCOND,nr_bins) :: corgp,corgpold,korg,corgp_eq
@@ -1120,12 +1120,12 @@ REAL(dp), DIMENSION(NCOND,nr_bins) :: corgp,corgpold,korg,corgp_eq
 REAL(dp), DIMENSION(NCOND), INTENT(in) :: Dorg
 REAL(dp), DIMENSION(NCOND)  :: Corgold,speedorg,aorg,morg,m_org,dm_orgdt,m_orgold
 
-REAL(dp), DIMENSION(nr_bins) :: cH2SO4pold,cHNO3pold,cHClpold,cCH3SO3Hpold,cHIO3pold,cDMApold,cNH3pold,KnH2SO4,&
-KnHNO3,KnHCl,KnCH3SO3H,KnHIO3,KnDMA,Knair,f_corH2SO4,f_corHNO3,f_corHCl,f_corCH3SO3H,f_corHIO3,f_corDMA,f_cororg,f_corair,DH2SO4eff,&
-DHNO3eff,DHCleff,DCH3SO3Heff,DHIO3eff,DDMAeff,Daireff,kH2SO4,&
-kHNO3,kHCl,kCH3SO3H,kHIO3,kDMA,kair,S_KelvinH2SO4,S_KelvinHNO3,S_KelvinHCl,S_KelvinCH3SO3H,S_KelvinHIO3,S_KelvinDMA,cH2SO4p,cHNO3p,cHClp,&
-cCH3SO3Hp,cHIO3p,cDMAp,term1, term2,cNap, cCO3p, cHCO3p, cOHp, cNH3p, charge, cNH4ion, cNH3aq,vp_dry,vp_wet, N_bins_fixed, &
-Cunningh, Diff_p,m_p,speed_p, gasmeanfpH2SO4, gasmeanfpHNO3, gasmeanfpHCl, gasmeanfpCH3SO3H, gasmeanfpHIO3, gasmeanfpDMA,gasmeanfporg, &
+REAL(dp), DIMENSION(nr_bins) :: cH2SO4pold,cHNO3pold,cHClpold,cCH3SO3Hpold,cHIO3pold,cHIO2pold,cDMApold,cNH3pold,KnH2SO4,&
+KnHNO3,KnHCl,KnCH3SO3H,KnHIO3,KnHIO2,KnDMA,Knair,f_corH2SO4,f_corHNO3,f_corHCl,f_corCH3SO3H,f_corHIO3,f_corHIO2,f_corDMA,f_cororg,f_corair,DH2SO4eff,&
+DHNO3eff,DHCleff,DCH3SO3Heff,DHIO3eff,DHIO2eff,DDMAeff,Daireff,kH2SO4,&
+kHNO3,kHCl,kCH3SO3H,kHIO3,kHIO2,kDMA,kair,S_KelvinH2SO4,S_KelvinHNO3,S_KelvinHCl,S_KelvinCH3SO3H,S_KelvinHIO3,S_KelvinDMA,cH2SO4p,cHNO3p,cHClp,&
+cCH3SO3Hp,cHIO3p,cDMAp,cHIO2p, term1, term2,cNap, cCO3p, cHCO3p, cOHp, cNH3p, charge, cNH4ion, cNH3aq,vp_dry,vp_wet, N_bins_fixed, &
+Cunningh, Diff_p,m_p,speed_p, gasmeanfpH2SO4, gasmeanfpHNO3, gasmeanfpHCl, gasmeanfpCH3SO3H, gasmeanfpHIO3,  gasmeanfpHIO2, gasmeanfpDMA,gasmeanfporg, &
 gasmeanfpair, Knorg, Dorgeff,Corgsat,xorg, N_bins_old,x_SVI
 
 REAL(dp), DIMENSION(nr_bins+1) :: vp_fixed
@@ -1156,6 +1156,7 @@ if (flag_clusterin) then
   surf_tens(9)=0.053 ! MSA
   surf_tens(10)=0.053 ! Assumed HIO3
   surf_tens(11)=0.053 ! Assumed DMA
+  surf_tens(12)=0.053 ! Assumed HIO2
 
   DO j=1,NSPEC_P
   S_Kelvin(j,:)=1D0+2D0*surf_tens(j)*MX(j)/(d_p/2D0*dens*Rg*T) ! equilibrium saturation ratio of condensing gas (Kelvin effect)
@@ -1176,11 +1177,12 @@ if (flag_clusterin) then
   cNH3pold=c_p(4,:)/Na*1D6   ! mol/m^3  
   cNap=c_p(5,:)/Na*1D6       ! mol/m^3 Na+
   cDMApold=c_p(11,:)/Na*1D6       ! mol/m^3 DMA
+  cHIO2pold=c_p(12,:)/Na*1D6       ! mol/m^3 DMA
 
-  corgpold(1:NCOND,:)=c_p(12:NSPEC_P,:)/Na*1D6 ! mol/m^3 cond org comp
+  corgpold(1:NCOND,:)=c_p(13:NSPEC_P,:)/Na*1D6 ! mol/m^3 cond org comp
   corgp=corgpold ! mol/m^3 cond org comp
 
-  aH2SO4=aX(1);aHNO3=aX(2);aHCl=aX(3); aCH3SO3H=aX(9); aHIO3=aX(10); aDMA=aX(11); aorg=aX(12:NSPEC_P)
+  aH2SO4=aX(1);aHNO3=aX(2);aHCl=aX(3); aCH3SO3H=aX(9); aHIO3=aX(10); aDMA=aX(11);  aHIO2=aX(12); aorg=aX(13:NSPEC_P)
 
   CH2SO4old=cH2SO4/Na*1D6 ! vapor mole concentration (mol m^-3)
   CHNO3old=cHNO3/Na*1D6   ! vapor mole concentration (mol m^-3)
@@ -1189,6 +1191,7 @@ if (flag_clusterin) then
   CCH3SO3Hold=cCH3SO3H/Na*1D6 ! vapor mole concentration (mol m^-3)     
   CHIO3old=cHIO3/Na*1D6 ! vapor mole concentration (mol m^-3)     
   CDMAold=cDMA/Na*1D6 ! vapor mole concentration (mol m^-3)
+  CHIO2old=cHIO2/Na*1D6 ! vapor mole concentration (mol m^-3)
 
   Corgold=corg/Na*1D6      
 
@@ -1197,6 +1200,7 @@ if (flag_clusterin) then
   DHCl=(0.22/1.42)*1D-4  ! gas diffusivity HCl m^2/s
   DCH3SO3H=1D-5       ! gas diffusivity CH3SO3H (MSA) m^2/s
   DHIO3=1D-5       ! gas diffusivity HIO3  m^2/s
+  DHIO2=1D-5       ! gas diffusivity HIO3  m^2/s
   DDMA=1.5D-5       ! gas diffusivity DMA  m^2/s
 
   Dair=0.22D-4           ! Air molecule gas diffusivity m^2/s
@@ -1216,8 +1220,8 @@ if (flag_clusterin) then
   mH2SO4=(MX(1)/Na+Keq1*RH*100.*(MX(1)+18D-3)/Na+Keq1*Keq2*(RH*100.)**2D0*(MX(1)+36D-3)/Na)/&
   (1D0+Keq1*RH*100.+Keq1*Keq2*(RH*100.)**2D0) ! RH H2SO4 molecular mass
 
-  mHNO3=MX(2)/Na; mHCl=MX(3)/Na ; mCH3SO3H=MX(9)/Na; mHIO3=MX(10)/Na; mDMA=MX(11)/Na
-  morg=MX(12:NSPEC_P)/Na
+  mHNO3=MX(2)/Na; mHCl=MX(3)/Na ; mCH3SO3H=MX(9)/Na; mHIO3=MX(10)/Na; mDMA=MX(11)/Na; mHIO2=MX(12)/Na
+  morg=MX(13:NSPEC_P)/Na
   m_air=Mair/Na
 
   speedH2SO4=SQRT(8D0*kb*T/(pi*mH2SO4)) ! speed of H2SO4 molecule
@@ -1225,6 +1229,7 @@ if (flag_clusterin) then
   speedHCl=SQRT(8D0*kb*T/(pi*mHCl))     ! speed of HCl molecules
   speedCH3SO3H=SQRT(8D0*kb*T/(pi*mCH3SO3H)) ! speed of CH3SO3H molecules
   speedHIO3=SQRT(8D0*kb*T/(pi*mHIO3)) ! speed of HIO3 molecules
+  speedHIO2=SQRT(8D0*kb*T/(pi*mHIO2)) ! speed of HIO3 molecules
   speedDMA=SQRT(8D0*kb*T/(pi*mDMA)) ! speed of DMA molecules
 
   speedorg=SQRT(8D0*kb*T/(pi*morg))     ! speed of organic molecules
@@ -1237,6 +1242,7 @@ if (flag_clusterin) then
   gasmeanfpHCl=3D0*(DHCl+Diff_p)/SQRT(speedHCl**2D0+speed_p**2D0)       
   gasmeanfpCH3SO3H=3D0*(DCH3SO3H+Diff_p)/SQRT(speedCH3SO3H**2D0+speed_p**2D0)       
   gasmeanfpHIO3=3D0*(DHIO3+Diff_p)/SQRT(speedHIO3**2D0+speed_p**2D0)       
+  gasmeanfpHIO2=3D0*(DHIO2+Diff_p)/SQRT(speedHIO2**2D0+speed_p**2D0)       
   gasmeanfpDMA=3D0*(DDMA+Diff_p)/SQRT(speedDMA**2D0+speed_p**2D0)   
 
   !gasmeanfpair=3D0*(Dair+Diff_p)/SQRT(speedair**2D0+speed_p**2D0)        
@@ -1247,6 +1253,7 @@ if (flag_clusterin) then
   KnHCl=2D0*gasmeanfpHCl/(d_p+dX(3))       ! Knudsen number HCl
   KnCH3SO3H=2D0*gasmeanfpCH3SO3H/(d_p+dX(9)) ! Knudsen number MSA (CH3SO3H)
   KnHIO3=2D0*gasmeanfpHIO3/(d_p+dX(10))    ! Knudsen number HIO3
+  KnHIO2=2D0*gasmeanfpHIO2/(d_p+dX(10))    ! Knudsen number HIO3
   KnDMA=2D0*gasmeanfpDMA/(d_p+dX(11)) ! Knudsen number DMA
 
   Knair=2D0*gasmeanfpair/(d_p+d_air)       ! Knudsen number H2SO4
@@ -1265,6 +1272,9 @@ if (flag_clusterin) then
 
   f_corHIO3=(0.75*aHIO3*(1D0+KnHIO3))/&
   (KnHIO3**2D0+KnHIO3+0.283*KnHIO3*aHIO3+0.75*aHIO3) ! Fuchs-Sutugin correction factor for transit and kinetic regime
+  
+  f_corHIO2=(0.75*aHIO2*(1D0+KnHIO2))/&
+  (KnHIO2**2D0+KnHIO2+0.283*KnHIO2*aHIO2+0.75*aHIO2) ! Fuchs-Sutugin correction factor for transit and kinetic regime
 
   f_corDMA=(0.75*aDMA*(1D0+KnDMA))/&
   (KnDMA**2D0+KnDMA+0.283*KnDMA*aDMA+0.75*aDMA) ! Fuchs-Sutugin correction factor for transit and kinetic regime
@@ -1278,6 +1288,7 @@ if (flag_clusterin) then
   DHCleff=(DHCl+Diff_p)*f_corHCl                         ! m^2/s
   DCH3SO3Heff=(DCH3SO3H+Diff_p)*f_corCH3SO3H             ! m^2/s
   DHIO3eff=(DHIO3+Diff_p)*f_corHIO3                      ! m^2/s
+  DHIO2eff=(DHIO2+Diff_p)*f_corHIO2                      ! m^2/s
   DDMAeff=(DDMA+Diff_p)*f_corDMA                      ! m^2/s
 
   CH2SO4sat=0D0 ! H2SO4 saturation mole concentration (mol m^-3) p/(R*T)
@@ -1287,6 +1298,7 @@ if (flag_clusterin) then
   kHCl=N_bins*2D0*pi*(d_p+dX(3))*DHCleff          ! mass transfer coefficient s^-1
   kCH3SO3H=N_bins*2D0*pi*(d_p+dX(9))*DCH3SO3Heff  ! mass transfer coefficient s^-1
   kHIO3=N_bins*2D0*pi*(d_p+dX(9))*DHIO3eff        ! mass transfer coefficient s^-1
+  kHIO2=N_bins*2D0*pi*(d_p+dX(9))*DHIO2eff        ! mass transfer coefficient s^-1
   kDMA=N_bins*2D0*pi*(d_p+dX(11))*DDMAeff        ! mass transfer coefficient s^-1
 
   kair=N_bins*2D0*pi*(d_p+d_air)*Daireff          ! mass transfer coefficient s^-1
@@ -1307,13 +1319,13 @@ if (flag_clusterin) then
   corgpold=corgp;  
 
   DO j=1,nr_bins
-  corgp_eq(:,j)=Corgold*(SUM(corgpold(:,j))+c_p(8,j)/Na*1D6)/(S_Kelvin(12:NSPEC_P,j)*psat_org/(Rg*T)*yorg(1:NCOND,j)) ! Approximate equilibrium concentration (mol/m^3) of each compound in each size bin   
+  corgp_eq(:,j)=Corgold*(SUM(corgpold(:,j))+c_p(8,j)/Na*1D6)/(S_Kelvin(13:NSPEC_P,j)*psat_org/(Rg*T)*yorg(1:NCOND,j)) ! Approximate equilibrium concentration (mol/m^3) of each compound in each size bin   
   ! corgp_eq(:,j)=Corgold*(SUM(corgpold(:,j))+SUM(c_p(7:8,j)))/(S_Kelvin(12:NSPEC_P,j)*psat_org/(Rg*T)*yorg(1:NCOND,j)) ! Approximate equilibrium concentration (mol/m^3) of each compound in each size bin   
   END DO
 
   DO j=1,NCOND-1
   !IF (psat_org(j)<1D-2 .AND. corg(j)>1D4) THEN ! Only consider condensation of compounds with substantial concentration and relatively low vapour pressure
-  IF ((corg(j)+SUM(c_p(12+j,:)))>1D6) THEN ! Only consider condensation/evaporation of compounds with substantial concentration gas+particles
+  IF ((corg(j)+SUM(c_p(13+j,:)))>1D6) THEN ! Only consider condensation/evaporation of compounds with substantial concentration gas+particles
   !xorg=corgpold(j,:)/(SUM(corgpold(1:NCOND,:),DIM=1)+SUM(c_p(7:8,:),DIM=1)/Na*1D6+1D-100) ! mole fraction of each organic compound in the organic + water particle phase
   xorg=corgpold(j,:)/(SUM(corgpold(1:NCOND,:),DIM=1)+c_p(8,:)/Na*1D6+1D-100) ! mole fraction of each organic compound in the organic + water particle phase
   Corgsat=yorg(j,:)*xorg*psat_org(j)/(Rg*T) 	! Saturation concentration (mol/m^3)  
@@ -1541,7 +1553,7 @@ if (flag_clusterin) then
 
 
   c_p(1,:)=cH2SO4p*1D-6*Na
-  c_p(12:NSPEC_P,:)=corgp(1:NCOND,:)*1D-6*Na
+  c_p(13:NSPEC_P,:)=corgp(1:NCOND,:)*1D-6*Na
 end if !! if flag_clusterin
 
 

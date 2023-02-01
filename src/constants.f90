@@ -92,6 +92,7 @@ MODULE constants
  REAL(dp), PARAMETER :: qMetal=2000. ! density of Metal (kg/m^3)
  REAL(dp), PARAMETER :: qMSA=1480. ! density of HIO3(kg/m^3)
  REAL(dp), PARAMETER :: qHIO3=2000. ! density of HIO3 in liquid form (assumed) (kg/m^3)
+ REAL(dp), PARAMETER :: qHIO2=2000. ! density of HIO3 in liquid form (assumed) (kg/m^3)
  
  
  
@@ -115,6 +116,7 @@ MODULE constants
  REAL(dp), PARAMETER :: MSO4=96D-3  ! Mol/kg
  REAL(dp), PARAMETER :: MMSA=96.1D-3 ! Molar mass (kg/mol) of MSA
  REAL(dp), PARAMETER :: MHIO3=175.9D-3 ! Molar mass (kg/mol) of MSA
+ REAL(dp), PARAMETER :: MHIO2=159.11D-3 ! Molar mass (kg/mol) of MSA
  REAL(dp), PARAMETER :: MDMA=46D-3 ! Molar mass (kg/mol) of DMA
  REAL(dp), PARAMETER :: MNH4=18D-3  ! Mol/kg
  REAL(dp), PARAMETER :: MNO3=62D-3  ! Mol/kg

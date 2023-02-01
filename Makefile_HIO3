@@ -4,15 +4,18 @@ F90 = /usr/local/bin/gfortran
 # Put .o and .mod files here:
 OBJDIR = build
 SRCDIR = src
+CHEM_MAIN_DIR =	chemistries
+ACDC_MAIN_DIR = ACDC_versions
 
-ACDC_DIR=Clusterin_multiple_chem_including_HIO3
+CHEM_DIR=$(CHEM_MAIN_DIR)/mcm_PRAMv1_DMS_I2O5_HIO2
+ACDC_DIR=$(ACDC_MAIN_DIR)/Clusterin_multiple_chem_including_HIO3
 NAC := $(shell find ${ACDC_DIR}/cluster_chem_* -maxdepth 0 -type d |wc -l|sed 's/ //g')
 
 CLUSTER_CHEM_NUM := $(shell seq $(NAC))
 # Directories to search files in (in addition to the current one)
 
 # VPATH = $(OBJDIR):chemistry_DMS_HM_20201222:$(ACDC_DIR):$(foreach n,$(CLUSTER_CHEM_NUM),$(ACDC_DIR)/cluster_chem_$(n):)
-VPATH = $(OBJDIR):src:mcm_PRAMv1_DMS_I2O5:megan:$(foreach n,$(CLUSTER_CHEM_NUM),$(ACDC_DIR)/cluster_chem_$(n):)
+VPATH = $(OBJDIR):src:$(CHEM_DIR):megan:$(foreach n,$(CLUSTER_CHEM_NUM),$(ACDC_DIR)/cluster_chem_$(n):)
 
 # When compiling, search for files in these directories:
 # VPATH = $(OBJDIR): mcm_PRAMv1_DMS megan ACDC_module_ions_2018_08_31 ACDC_module_2016_09_23
@@ -64,11 +67,11 @@ ACDC_OBJECTS = \
 #   $<   first prerequisite
 #   $^   all dependencies, duplicates removed
 
-all: adchem1D.exe
+all: HIO3_adchem1D.exe
 
 # Here is the link step:
 
-adchem1D.exe: adchem1D.o $(MAIN_OBJECTS) $(CHEM_OBJECTS) $(MEGAN_OBJECTS) $(ACDC_OBJECTS) 
+HIO3_adchem1D.exe: adchem1D.o $(MAIN_OBJECTS) $(CHEM_OBJECTS) $(MEGAN_OBJECTS) $(ACDC_OBJECTS) 
 	 $(F90) $(OPTS1) $^ -o $@
 
 # Here are the compile steps:
@@ -93,7 +96,7 @@ $(OBJDIR)/dynamics.o: dynamicsDMS_atm_clusterin_HIO3.f90 constants.o acdc_dataty
 $(OBJDIR)/diffusivity.o: diffusivity.f90 constants.o $(CHEM_OBJECTS)
 	 $(F90) $(OPTS) -c $< -o $@	 	 
 
-$(OBJDIR)/constants.o: constants.f90 $(CHEM_OBJECTS)
+$(OBJDIR)/constants.o: constants_HIO3.f90 $(CHEM_OBJECTS)
 	 $(F90) $(OPTS) -c $< -o $@
 
 $(OBJDIR)/acidity.o: acidityDMS.f90 $(CHEM_OBJECTS)
@@ -246,7 +249,7 @@ clean:
 	-@rm $(ACDC_OBJECTS)  $(ACDC_MODS)         2>/dev/null || true
 	-@cd $(OBJDIR) ; rm adchem1D.o  $(MAIN_OBJECTS) $(MEGAN_OBJECTS) $(MAIN_MODS) $(MEGAN_MODS) 2>/dev/null || true
 	-@cd $(OBJDIR) ; rm aciditydms* driver_acdc_j* clusterin_plugin* dynamicsdms_atm* reaction_rates* thermodynamics*  2>/dev/null || true
-	-@rm adchem1D.exe                                                 2>/dev/null || true
+	-@rm *adchem1D.exe                                                 2>/dev/null || true
 
 # With 'clean', don't remove chemistry object files, since it takes very long (minutes, or tens of minutes if big chemistry)
 # to compile them, and there usually is no need to recompile them
@@ -256,7 +259,7 @@ clean:
 cleanall:
 	-@cd $(OBJDIR) ; rm $(MAIN_OBJECTS) $(CHEM_OBJECTS) $(CHEM_MODS) $(MEGAN_OBJECTS) $(ACDC_OBJECTS)    2>/dev/null || true
 	-@cd $(OBJDIR) ; rm adchem1D.o                                    2>/dev/null || true
-	-@rm adchem1D.exe                                                 2>/dev/null || true
+	-@rm *adchem1D.exe                                                 2>/dev/null || true
 	-@rm $(OBJDIR)/*                                                  2>/dev/null || true
 
 # Some explanation for the clean commands:

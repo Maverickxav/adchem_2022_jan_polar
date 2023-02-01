@@ -186,7 +186,7 @@ PROGRAM adchem1D_new
     ! Particle compound specific properties in each particle layer and size bin
     REAL(dp), DIMENSION(Nz,NSPEC_P,nr_bins) :: c_p,c_p_old  ! (molec cm^3) Matrix with the concentration of all species in each particle layer for each particle size 
     REAL(dp), DIMENSION(NSPEC_P,nr_bins) :: c_p_backg
-	REAL(dp), DIMENSION(NSPEC_P)         :: c_p_nucl, c_p_nuclDMA	
+	REAL(dp), DIMENSION(NSPEC_P)         :: c_p_nucl, c_p_nuclDMA, c_p_nuclIO
     REAL(dp), DIMENSION(NMLAYER) :: Vi, DiffX, dVidt
     REAL(dp), DIMENSION(NSPEC_P,nr_bins) :: c_p_L,c_p_L23
     REAL(dp), DIMENSION(NSPEC_P,nr_bins) :: c_p1
@@ -326,7 +326,7 @@ PROGRAM adchem1D_new
 	REAL(dp), DIMENSION(nr_bins)  :: S_c,c_H,ns,vp0,dp0,A_Kohler,B_Kohler,alpha1,alpha2,fCCN,fCS,b_ko,d_ko,lambda_ko1,lambda_ko2
     REAL(dp)                      :: S_super,CCN,dp_drops,m_drops,dp_max
     REAL(dp)            :: cw,Hion=1D-3,OHion
-	REAL(dp), DIMENSION(51) :: alpha_aq,D_aq,dX_aq,VX_aq,c_speed_aq,CS_AQ,MX_aq
+	REAL(dp), DIMENSION(52) :: alpha_aq,D_aq,dX_aq,VX_aq,c_speed_aq,CS_AQ,MX_aq
     REAL(dp), DIMENSION(nr_bins) :: Cunningh,Diff_p,m_p,speed_p,gasmeanfp_aq,Kn_aq,f_cor_aq,Deff_aq
     REAL(dp) :: dyn_visc,l_gas,fHCl
 	REAL(dp), DIMENSION(NSPEC) :: conc_old,dconc
@@ -355,8 +355,8 @@ PROGRAM adchem1D_new
     REAL(DP) :: cHIO2(nz)
     ! REAL(dp), ALLOCATABLE :: c_p_clust1(:,:),c_p_clust2(:,:), v_clust1(:),v_clust2(:)
     
-    l_condensation_evap=.False.
-    l_coagulation_loss=.True.
+    l_condensation_evap=.True.
+    l_coagulation_loss=.False.
 
   
     comp_evap=0D0
@@ -412,8 +412,8 @@ PROGRAM adchem1D_new
 !**************************************************************************************************************************************************************************
       !       Cl2, Cl,  ClO,ClO2, HCl,HOCl,ClNO,ClNO2,ClNO3,Br2,Br, BrO,HBr,HOBr,BrNO2,BrNO3,BrCl,I2,   I,   IO,  OIO, I2O2,HI,  HOI, HIO3,INO2
       MX_aq=(/71.,35.5,51.5,67.5,36.5,52.5,65.5,81.5, 97.5,160.,80.,96.,81.,97., 126.,142., 115.5,254.,127.,143.,159.,286.,128.,144.,176.,173.,&
-             189.,162.5,207.,48.,17.,34. ,62.,78., 94.,  80., 108., 64.,33.,62.,100.,30., 46.,32.,80.,17.,45.,107.,63.,98.,97./)*1D-3     
-            !INO3,ICl,  IBr, O3, OH, H2O2,DMS,DMSO,DMSO2,MSIA,HPMTF,SO2,HO2,NO3,RO2, HCHO,NO2,O2,SO3,NH3,DMA,HOOCH2SCO,HNO3,H2SO4,MSA
+             189.,162.5,207.,48.,17.,34. ,62.,78., 94.,  80., 108., 64.,33.,62.,100.,30., 46.,32.,80.,17.,45.,107.,63.,98.,97.,159.11/)*1D-3     
+            !INO3,ICl,  IBr, O3, OH, H2O2,DMS,DMSO,DMSO2,MSIA,HPMTF,SO2,HO2,NO3,RO2, HCHO,NO2,O2,SO3,NH3,DMA,HOOCH2SCO,HNO3,H2SO4,MSA, HIO2
 
        ! 5.3D-4 Kreidenweis et al. [2003] O3
        D_aq=1D-5
@@ -445,6 +445,7 @@ PROGRAM adchem1D_new
        alpha_aq(33)=0.001 ! DMS
        alpha_aq(50)=1D0   ! H2SO4
        alpha_aq(51)=1D0   ! MSA
+       alpha_aq(52)=1D0   ! MSA
 	   
 	   
 dz=z(2:Nz+1)-z(1:Nz)
@@ -604,7 +605,7 @@ dz2=(dz(2:Nz)+dz(1:Nz-1))/2D0
     !!! read ofr clusterin
     do kk=1, clustering_systems
    
-        WRITE (filename, fmt='(a,I1a)') './Clusterin_multiple_chem_including_HIO3/cluster_chem_spec_',kk,'.txt'
+        WRITE (filename, fmt='(a,I1a)') './ACDC_versions/Clusterin_multiple_chem_including_HIO3/cluster_chem_spec_',kk,'.txt'
         open(400,FILE=filename,action='read')
         read (400,*) n_vapor_syst
              i = 0
@@ -952,12 +953,13 @@ y_org_water=1D0
     dimer_H=0D0    
     Morg = mcm_prop(1,:)*1D-3  ! Molar mass (kg/mol) of all condensable organic compounds
 
-    MX = (/ MSO4,MNO3,MCl,MNH4,MNa,MEC,MH2O,MH2O,MMSA,MHIO3,MDMA,Morg(1:NCOND)/) ! (kg/mol) Vector with mole masses of all species in the particle phase
+    MX = (/ MSO4,MNO3,MCl,MNH4,MNa,MEC,MH2O,MH2O,MMSA,MHIO3,MDMA,MHIO2,Morg(1:NCOND)/) ! (kg/mol) Vector with mole masses of all species in the particle phase
     qX(1:8)=(/ qSO4,qNO3,qCl,qNH4,qNa,qEC,qH2O,qH2O /) ! (kg/m^3) Vector with species specific densities in the particle phase
     qX(9)=qMSA ! MSA
 	qX(10)=qHIO3 ! HIO3
 	qX(11)=qDMA ! DMA
-	qX(12:NSPEC_P)=qHC
+	qX(12)=qHIO2 ! HIO3
+	qX(13:NSPEC_P)=qHC
     VX=MX/qX/Na*1D6 ! (cm^3 molec) Molecule volumes 
     molec_radius=1./2.*(VX*6./pi)**(1./3.)*1D-2;    ! (m) Estimated radius of molecules
     viscosity = 1D5 ! (Pa s) Initial particle viscosity (add particle phase water content dependence (RH dependence))  
@@ -977,7 +979,7 @@ y_org_water=1D0
   
     ! Particle initialization (1.07 nm growth ACDC)
     !d(1)=MAXVAL((/ 1.022D-9,delta_surf*2+1D-11 /)) ! Minimum size set by kinetic multi-layer model  
-    d(1)=1.022D-9!MAXVAL((/ 1.022D-9,delta_surf*2+1D-11 /)) ! Minimum size set by kinetic multi-layer model  
+    d(1)=1.00001D-9 !1.022D-9!MAXVAL((/ 1.022D-9,delta_surf*2+1D-11 /)) ! Minimum size set by kinetic multi-layer model  
 	vp(1)=(pi*d(1)**3)/6
     DO i=2,nr_bins+1
        vp(i)=vp(i-1)*1.32!1.265!1.31922 1.36!
@@ -1310,6 +1312,7 @@ y_org_water=1D0
     conc(:,ind_HCl) = 1D0 ! HCl
     conc(:,ind_MSA) = 1D0 ! MSA
 	conc(:,ind_HIO3) = 1D0 ! HIO3
+	conc(:,ind_HIO2) = 1D0 ! HIO2
 	!cHCl=1D0   ! Initial HCl concentration
     conc(:,ind_NH3) = 1D3   ! Initial NH3 concentration
     conc(:,ind_DMA) = 1D1   ! Initial DMA concentration
@@ -1342,7 +1345,7 @@ y_org_water=1D0
 	
 
     c_p_nucl=0.
-	c_p_nuclDMA=0.
+	! c_p_nuclDMA=0.
     !! IF NH3 + H2SO4 clusters are formed
     c_p_nucl(1)=MX(1)/(MX(1)+MX(4))*V_bins(1,1)/N_bins(1,1)*qX(1)/MX(1)*Na
     c_p_nucl(4)=MX(4)/(MX(1)+MX(4))*V_bins(1,1)/N_bins(1,1)*qX(4)/MX(4)*Na
@@ -1354,6 +1357,13 @@ y_org_water=1D0
     c_p_nuclDMA(1)=MX(1)/(MX(1)+MX(11))*V_bins(1,2)/N_bins(1,2)*qX(1)/MX(1)*Na
     c_p_nuclDMA(11)=MX(11)/(MX(1)+MX(11))*V_bins(1,2)/N_bins(1,2)*qX(11)/MX(11)*Na
 	c_p_nuclDMA(7)=0.1*SUM(c_p_nuclDMA)
+	
+    ! IF the particle number concentration in any size bin go below a minimum value the concentration
+	! c_p_nuclIO=0.
+	! ! IF HIO3 + HIO2 clusters are formed
+    ! c_p_nuclIO(10)=MX(10)/(MX(10)+MX(12))*V_bins(1,2)/N_bins(1,2)*qX(1)/MX(1)*Na
+    ! c_p_nuclIO(12)=MX(11)/(MX(10)+MX(12))*V_bins(1,2)/N_bins(1,2)*qX(11)/MX(11)*Na
+	! c_p_nucIO(7)=0.1*SUM(c_p_nuclIO)
 	
     ! IF the particle number concentration in any size bin go below a minimum value the concentration
     ! is corrected up to the particle composition of c_p_backg.
@@ -2131,10 +2141,10 @@ IF(nucleation_index==1) THEN
     
     ! write(*,*) 'l2089 before nucl call',  Jnucl_N(1)*1d-6,Jnucl_D(1)*1d-6,'D:',sum(conc(:, ind_DMA),dim=1),'A:',sum(conc(:, ind_H2SO4),dim=1),'N:', &
     ! sum(conc(:, ind_NH3),dim=1)
-    write(*,*) 'l2111 nbins ', sum(N_bins(1,1:10))!, sum(chem_1%conc_coag_clust), sum(chem_2%conc_coag_clust), sum(comp_evap(:,1),dim=1), sum(comp_evap(:,4),dim=1), sum(comp_evap(:,11),dim=1)
-    cHIO2=1D5
+    write(*,*) 'l2144 nbins ', sum(N_bins(1,1:10))!, sum(chem_1%conc_coag_clust), sum(chem_2%conc_coag_clust), sum(comp_evap(:,1),dim=1), sum(comp_evap(:,4),dim=1), sum(comp_evap(:,11),dim=1)
+    ! cHIO2=1D5
     ! conc(:,ind_HIO3)=1D6
-    write(*,*) 'l2146 [HIO2] = ', cHIO2(1)
+    write(*,*) 'l2146 [HIO2] = ', conc(1,ind_HIO2),'',conc(1,ind_HIO3),'',conc(1,ind_H2SO4),'',conc(1,ind_DMA),'',conc(1,ind_NH3)
     
     DO j=1, nz
         ipr=q_ion(j)*1D6 ! Ion production rate (ions/m^3/s)
@@ -2149,7 +2159,7 @@ IF(nucleation_index==1) THEN
 
         if (clust_firstcall) then
                 call clustering_subroutine(chem_1, chem_2, chem_3, clust_firstcall, n_clustering_vapors, nr_bins, conc(j,ind_H2SO4), & 
-                conc(j,ind_dma), conc(j,ind_NH3),conc(j,ind_HIO3), cHIO2(j), Jnucl_N(j), Jnucl_D(j), Jnucl_I(j), &
+                conc(j,ind_dma), conc(j,ind_NH3),conc(j,ind_HIO3), conc(j,ind_HIO2), Jnucl_N(j), Jnucl_D(j), Jnucl_I(j), &
                 diameter_acdc,diameter_acdcDMA,diameter_acdcHIO3, CS_H2SO4(j),Ts(j,tr),Ps(j,tr),ipr,dt, d, d_p(j,:),&
                 m_p, N_bins1,Mx, qX, n_evap(j), comp_evap(j,:), clustering_systems, c_clusters1, c_clusters2, c_clusters3,j,&
                 l_condensation_evap,l_coagulation_loss)
@@ -2169,9 +2179,9 @@ IF(nucleation_index==1) THEN
                 
                 !!IiIo system
                 Mx_chem3(1)=Mx(10)
-                Mx_chem3(2)=159.91D-3
-                qX_chem3(1) =4630.!qX(10)
-                qX_chem3(2) =4630. !qX(10) !! assumed same as HIO3
+                Mx_chem3(2)=Mx(12)
+                qX_chem3(1) =qX(10)
+                qX_chem3(2) =qX(12) !! assumed same as HIO3
 
                 do kk=1, chem_1%nclust_out
                     ! volume_chem1=real(chem_1%clust_out_molec(kk,:),KIND=dp)
@@ -2239,7 +2249,7 @@ IF(nucleation_index==1) THEN
                     
                     DO i=1,chem_3%nclust_syst
                         chem_3%c_p_clust(10,i) = REAL(chem_3%clust_molec(i,1),KIND=dp)
-                        chem_3%c_p_clust(10,i) = REAL(chem_3%clust_molec(i,2),KIND=dp)
+                        chem_3%c_p_clust(12,i) = REAL(chem_3%clust_molec(i,2),KIND=dp)
                         chem_3%v_clust(i)=SUM(chem_3%c_p_clust(index_dry,i)/Na*MX(index_dry)/qX(index_dry)) ! m^3
                     END DO
                 end if
@@ -2252,7 +2262,7 @@ IF(nucleation_index==1) THEN
                 ! l_condensation_evap,l_coagulation_loss)
 
                 call clustering_subroutine(chem_1, chem_2, chem_3, clust_firstcall, n_clustering_vapors, nr_bins, conc(j,ind_H2SO4), & 
-                conc(j,ind_dma), conc(j,ind_NH3),conc(j,ind_HIO3), cHIO2(j), Jnucl_N(j), Jnucl_D(j), Jnucl_I(j), &
+                conc(j,ind_dma), conc(j,ind_NH3),conc(j,ind_HIO3), conc(j,ind_HIO2), Jnucl_N(j), Jnucl_D(j), Jnucl_I(j), &
                 diameter_acdc,diameter_acdcDMA,diameter_acdcHIO3, CS_H2SO4(j),Ts(j,tr),Ps(j,tr),ipr,dt, d, d_p(j,:),&
                 m_p, N_bins1,Mx, qX, n_evap(j), comp_evap(j,:), clustering_systems, c_clusters1, c_clusters2, c_clusters3,j,&
                 l_condensation_evap,l_coagulation_loss)
@@ -2270,6 +2280,7 @@ IF(nucleation_index==1) THEN
             c_p(j,4,:) = c_p(j,4,:)+chem_1%conc_coag_molec(:,2)*1D-6 !!! NH3
             c_p(j,11,:) = c_p(j,11,:)+chem_2%conc_coag_molec(:,2)*1D-6  !!! DMA
             c_p(j,10,:) = c_p(j,10,:)+chem_3%conc_coag_molec(:,1)*1D-6  !!! HIO3
+            c_p(j,12,:) = c_p(j,12,:)+chem_3%conc_coag_molec(:,2)*1D-6  !!! HIO2
 
             N_bins1=N_bins(j,:); V_bins1=V_bins(j,:); d_p1=d_p(j,:); dp_dry1=dp_dry(j,:)
             dens_p1=dens_p(j,:); c_p1=c_p(j,:,:)
@@ -2345,8 +2356,8 @@ IF(nucleation_index==1) THEN
     end do
 
     ! write(*,*) real(chem_1%clust_out_molec,KIND=dp)
-    write(*,*) 'l2335 nbins ', sum(N_bins(1,1:10))!, sum(chem_1%conc_coag_clust), sum(chem_2%conc_coag_clust) , sum(comp_evap(:,1),dim=1), sum(comp_evap(:,4),dim=1), sum(comp_evap(:,11),dim=1)
-    write(*,*) 'l2347 [HIO2] = ', cHIO2(1)
+    write(*,*) 'l2359 nbins ', sum(N_bins(1,1:10))!, sum(chem_1%conc_coag_clust), sum(chem_2%conc_coag_clust) , sum(comp_evap(:,1),dim=1), sum(comp_evap(:,4),dim=1), sum(comp_evap(:,11),dim=1)
+    write(*,*) 'l2347 [HIO2] = ', conc(1,ind_HIO2),'',conc(1,ind_HIO3),'',conc(1,ind_H2SO4),'',conc(1,ind_DMA),'',conc(1,ind_NH3)
 end if
  
     ! Dry and wet deposition of particles                         !
@@ -2998,7 +3009,7 @@ END DO
 		  fHIO31=fHIO3(j,:)
 		  CALL condensation(N_bins1,V_bins1,Ps(j,tr),Ts(j,tr),RH(j),&
 		       d_p1,dp_dry1,aX,MX,qX,molec_radius,dens_p1,corg,conc(j,ind_H2SO4),conc(j,ind_HNO3),&
-               conc(j,ind_HCl),conc(j,ind_MSA),conc(j,ind_HIO3),conc(j,ind_NH3),conc(j,ind_DMA),&
+               conc(j,ind_HCl),conc(j,ind_MSA),conc(j,ind_HIO3),conc(j,ind_NH3),conc(j,ind_DMA),conc(j,ind_HIO2),&
 			   c_p1,W1,Kprim_HNO31,Kprim_HCl1,Kprim_CH3SO3H1,Kprim_HIO31,Hprim_NH31,Kprim_NH31,&
 			   fHSO41,fSO41,fNO31,fCl1,fCH3SO31,fHIO31,mHCO31,mCO31,mOH1,psat_org,&
 			   yorg,Dorg,CS_H2SO4(j),CS_air(j),c_p_backg,dt, n_evap_not_inuse(j),comp_evap_via_condensation(j,:), &

@@ -82,9 +82,9 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, clust_firstcall, n_clust
         CALL initialize_chem(chem_3,3)
         
         clust_firstcall=.false.      
-        write(*,*) 'nceq_syst', chem_1%neq_syst, '', chem_2%neq_syst
-        write(*,*) 'nclust_syst', chem_1%nclust_syst, '', chem_2%nclust_syst
-        write(*,*) 'nclust_out', chem_1%nclust_out, '', chem_2%nclust_out
+        write(*,*) 'nceq_syst', chem_1%neq_syst, '', chem_2%neq_syst,'',chem_3%neq_syst
+        write(*,*) 'nclust_syst', chem_1%nclust_syst, '', chem_2%nclust_syst, '', chem_3%nclust_syst
+        write(*,*) 'nclust_out', chem_1%nclust_out, '', chem_2%nclust_out,'', chem_3%nclust_out
 
     end if
 
@@ -99,9 +99,10 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, clust_firstcall, n_clust
 
 
     cH2SO4 = cH2SO4 + comp_evap(1)
-    cNH3   = cNH3 + comp_evap(4)
-    cDMA   = cDMA + comp_evap(11)
-    cHIO3    = cHIO3 + comp_evap(10)
+    cNH3   = cNH3   + comp_evap(4)
+    cDMA   = cDMA   + comp_evap(11)
+    cHIO3  = cHIO3  + comp_evap(10)
+    cHIO2  = cHIO3  + comp_evap(12)
  
     ! write(*,*) 'in clusterin module nconc_evap1 and 2' , nconc_evap1, nconc_evap2,layer
  
@@ -110,7 +111,8 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, clust_firstcall, n_clust
         chem_1%nmols_evap(1) = comp_evap(1)*1.D6/n_evap ! H2SO4
         chem_1%nmols_evap(2) = comp_evap(4)*1.D6/n_evap ! NH3
         chem_2%nmols_evap(2) = comp_evap(11)*1.D6/n_evap ! NH3
-        chem_3%nmols_evap(1) = comp_evap(10)*1.D6/n_evap ! NH3
+        chem_3%nmols_evap(1) = comp_evap(10)*1.D6/n_evap ! HIO3
+        chem_3%nmols_evap(2) = comp_evap(12)*1.D6/n_evap ! HIO2
         
         chem_2%nmols_evap(1)= chem_1%nmols_evap(1)
     end if
@@ -191,6 +193,7 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, clust_firstcall, n_clust
     cH2SO4=chem_2%conc_vapor(1)*1d-6
     cDMA=chem_2%conc_vapor(2)*1d-6
 
+    !!!!!! HIO3-HIO2 system
     chem_3%conc_vapor=(/c_Ii ,c_Io/)
 
     if (l_cond_evap) then
@@ -216,6 +219,7 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, clust_firstcall, n_clust
         write(*,*) 'No aerosol-cluster feedback selected'
     end if
 
+    !!!!! update HIO3, HIO2 conc
     cHIO3=chem_3%conc_vapor(1)*1d-6
     cHIO2=chem_3%conc_vapor(2)*1d-6
 

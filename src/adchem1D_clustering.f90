@@ -588,7 +588,7 @@ dz2=(dz(2:Nz)+dz(1:Nz-1))/2D0
     !!! read ofr clusterin
     do kk=1, clustering_systems
    
-        WRITE (filename, fmt='(a,I1a)') './Clusterin_multiple_chem/cluster_chem_spec_',kk,'.txt'
+        WRITE (filename, fmt='(a,I1a)') './ACDC_versions/Clusterin_multiple_chem/cluster_chem_spec_',kk,'.txt'
         open(400,FILE=filename,action='read')
         read (400,*) n_vapor_syst
              i = 0
