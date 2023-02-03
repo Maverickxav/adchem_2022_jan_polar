@@ -352,76 +352,100 @@ PROGRAM adchem1D_new
     real(dp), allocatable  :: Mx_chem1(:), Mx_chem2(:),Mx_chem3(:),Mx_chem4(:), qX_chem1(:), qx_chem2(:),qx_chem3(:),qx_chem4(:)
     real(dp) ::  real_tmp1, real_tmp2, real_tmp3,  volume_chem1,volume_chem2,volume_chem3,volume_chem4
     logical :: l_condensation_evap, l_coagulation_loss, three_comp, two_comp
-    integer:: systems
+    logical :: AN, AD, IiIo, AMsD
+    integer:: systems, ncases
 
     !!! for testing use constant hio2
     REAL(DP) :: cHIO2(nz)
     integer:: n_3comp_sys=1
     ! REAL(dp), ALLOCATABLE :: c_p_clust1(:,:),c_p_clust2(:,:), v_clust1(:),v_clust2(:)
     
-    l_condensation_evap=.false.
-    l_coagulation_loss=.true.
-    three_comp=.false.
+    l_condensation_evap=.TRUE.
+    l_coagulation_loss=.FALSE.
+    three_comp=.true.
     two_comp=.true.
 
-    
+    AN=.TRUE.
+    AD=.TRUE.
+    IiIo=.TRUE.
+    AMsD=.true.
+
     comp_evap=0D0
     !! condensation update
 
-    allocate(chem_1%names_vapor(n_clustering_vapors))
-    allocate(chem_1%conc_vapor(n_clustering_vapors))
-    allocate(chem_1%nmols_evap(n_clustering_vapors))
+    ! allocate(chem_1%names_vapor(n_clustering_vapors))
+    ! allocate(chem_1%conc_vapor(n_clustering_vapors))
+    ! allocate(chem_1%nmols_evap(n_clustering_vapors))
     
-    allocate(chem_2%names_vapor(n_clustering_vapors))
-    allocate(chem_2%conc_vapor(n_clustering_vapors))
-    allocate(chem_2%nmols_evap(n_clustering_vapors))
+    ! allocate(chem_2%names_vapor(n_clustering_vapors))
+    ! allocate(chem_2%conc_vapor(n_clustering_vapors))
+    ! allocate(chem_2%nmols_evap(n_clustering_vapors))
     
-    allocate(chem_3%names_vapor(n_clustering_vapors))
-    allocate(chem_3%conc_vapor(n_clustering_vapors))
-    allocate(chem_3%nmols_evap(n_clustering_vapors))
+    ! allocate(chem_3%names_vapor(n_clustering_vapors))
+    ! allocate(chem_3%conc_vapor(n_clustering_vapors))
+    ! allocate(chem_3%nmols_evap(n_clustering_vapors))
     
     
-    allocate(chem_1%nconc_evap(nz))
-    allocate(chem_2%nconc_evap(nz))
-    allocate(chem_3%nconc_evap(nz))
-    allocate(names_vapor_syst_readin(n_clustering_vapors,clustering_systems))
+    ! allocate(chem_1%nconc_evap(nz))
+    ! allocate(chem_2%nconc_evap(nz))
+    ! allocate(chem_3%nconc_evap(nz))
     
-    allocate(Mx_chem1(n_clustering_vapors))
-    allocate(Mx_chem2(n_clustering_vapors))
-    allocate(Mx_chem3(n_clustering_vapors))
+    ! allocate(Mx_chem1(n_clustering_vapors))
+    ! allocate(Mx_chem2(n_clustering_vapors))
+    ! allocate(Mx_chem3(n_clustering_vapors))
     
-    allocate(qX_chem1(n_clustering_vapors))
-    allocate(qX_chem2(n_clustering_vapors))
-    allocate(qX_chem3(n_clustering_vapors))
+    ! allocate(qX_chem1(n_clustering_vapors))
+    ! allocate(qX_chem2(n_clustering_vapors))
+    ! allocate(qX_chem3(n_clustering_vapors))
     
-    call get_system_size_1(neq_syst=chem_1%neq_syst)
-    call get_system_size_2(neq_syst=chem_2%neq_syst)
-    call get_system_size_3(neq_syst=chem_3%neq_syst)
+    ! call get_system_size_1(neq_syst=chem_1%neq_syst)
+    ! call get_system_size_2(neq_syst=chem_2%neq_syst)
+    ! call get_system_size_3(neq_syst=chem_3%neq_syst)
     
-    allocate(c_clusters_n(nz,chem_1%neq_syst))
-    allocate(c_clusters_d(nz,chem_2%neq_syst))
-    allocate(c_clusters_i(nz,chem_3%neq_syst))
+    ! allocate(c_clusters_n(nz,chem_1%neq_syst))
+    ! allocate(c_clusters_d(nz,chem_2%neq_syst))
+    ! allocate(c_clusters_i(nz,chem_3%neq_syst))
     
-    allocate(c_clusters1(chem_1%neq_syst))
-    allocate(c_clusters2(chem_2%neq_syst))
-    allocate(c_clusters3(chem_3%neq_syst))
+    ! allocate(c_clusters1(chem_1%neq_syst))
+    ! allocate(c_clusters2(chem_2%neq_syst))
+    ! allocate(c_clusters3(chem_3%neq_syst))
     
-    c_clusters1=0d0; c_clusters2=0d0; c_clusters3=0d0; c_clusters_n=0d0;c_clusters_d=0d0;c_clusters_i=0d0;
-    n_evap=0D0; ;comp_evap=0D0; comp_evap_via_condensation=0D0
     
-    if (three_comp) THEN
-        allocate(chem_4%names_vapor(n_clustering_vapors_3comp))
-        allocate(chem_4%conc_vapor(n_clustering_vapors_3comp))
-        allocate(chem_4%nmols_evap(n_clustering_vapors_3comp))
-        allocate(chem_4%nconc_evap(nz))
+    if (AN) then
+        call allocate_chem_dimensions(chem_1, MX_chem1,qX_chem1, c_clusters_n,c_clusters1, nz, n_clustering_vapors, 1)
+        write(*,*) 'AN'
+    end if  
+    if (AD) then
+        write(*,*) 'AD'
+        call allocate_chem_dimensions(chem_2, MX_chem2,qX_chem2, c_clusters_d,c_clusters2, nz, n_clustering_vapors, 2)
+    end if  
+    if(IiIo) THEN
+        write(*,*) 'II'
+        call allocate_chem_dimensions(chem_3, MX_chem3,qX_chem3, c_clusters_i,c_clusters3, nz, n_clustering_vapors, 3)
+    end if  
+    IF(AMsD) then
+        write(*,*) 'AMsD'
+        call allocate_chem_dimensions(chem_4, MX_chem4,qX_chem4, c_clusters_m,c_clusters4, nz, n_clustering_vapors_3comp, 4)
         allocate(names_vapor_syst_readin_3comp(n_clustering_vapors_3comp,n_3comp_sys))
-        allocate(Mx_chem4(n_clustering_vapors_3comp))
-        allocate(qX_chem4(n_clustering_vapors_3comp))
-        call get_system_size_4(neq_syst=chem_4%neq_syst)
-        allocate(c_clusters_m(nz,chem_4%neq_syst))
-        allocate(c_clusters4(chem_4%neq_syst))
-        c_clusters4=0d0;c_clusters_m=0d0
-    end if
+    end if    
+    allocate(names_vapor_syst_readin(n_clustering_vapors,clustering_systems))
+    ! c_clusters1=0d0; c_clusters2=0d0; c_clusters3=0d0; c_clusters_n=0d0;c_clusters_d=0d0;c_clusters_i=0d0;
+    n_evap=0D0; ;comp_evap=0D0; comp_evap_via_condensation=0D0
+
+    ! write(*,*) sum(c_clusters1), sum(c_clusters2), sum(c_clusters3), sum(c_clusters4)
+    
+    ! if (three_comp) THEN
+    !     ! allocate(chem_4%names_vapor(n_clustering_vapors_3comp))
+    !     ! allocate(chem_4%conc_vapor(n_clustering_vapors_3comp))
+    !     ! allocate(chem_4%nmols_evap(n_clustering_vapors_3comp))
+    !     ! allocate(chem_4%nconc_evap(nz))
+    !     ! allocate(Mx_chem4(n_clustering_vapors_3comp))
+    !     ! allocate(qX_chem4(n_clustering_vapors_3comp))
+    !     ! call get_system_size_4(neq_syst=chem_4%neq_syst)
+    !     ! allocate(c_clusters_m(nz,chem_4%neq_syst))
+    !     ! allocate(c_clusters4(chem_4%neq_syst))
+    !     ! c_clusters4=0d0;c_clusters_m=0d0
+    ! end if
 
     use_clustering_plugin=.True.
     clust_evap=.True.
@@ -624,7 +648,7 @@ dz2=(dz(2:Nz)+dz(1:Nz-1))/2D0
 	
 
     !!! read ofr clusterin
-    if (three_comp) THEN
+    if (AMsD) THEN
         systems=clustering_systems+n_3comp_sys
     else
         systems=clustering_systems
@@ -632,7 +656,7 @@ dz2=(dz(2:Nz)+dz(1:Nz-1))/2D0
 
     do kk=1, systems  
         if (kk <= 3) then   
-            WRITE (filename, fmt='(a,I1a)') './ACDC_versions/Clusterin_multiple_chem_SA-MSA-DMA/cluster_chem_spec_',kk,'.txt'
+            WRITE (filename, fmt='(a,I1a)') './ACDC_versions/Clusterin_multiple_chem_MSA/cluster_chem_spec_',kk,'.txt'
             open(400,FILE=filename,action='read')
             read (400,*) n_vapor_syst
                 i = 0
@@ -643,7 +667,7 @@ dz2=(dz(2:Nz)+dz(1:Nz-1))/2D0
                 close(400)
                 write(*,*) 'l567',' ', names_vapor_syst_readin(:,kk)
         else
-            WRITE (filename, fmt='(a,I1a)') './ACDC_versions/Clusterin_multiple_chem_SA-MSA-DMA/cluster_chem_spec_',kk,'.txt'
+            WRITE (filename, fmt='(a,I1a)') './ACDC_versions/Clusterin_multiple_chem_MSA/cluster_chem_spec_',kk,'.txt'
             open(400,FILE=filename,action='read')
             read (400,*) n_vapor_syst
                 i = 0
@@ -657,13 +681,17 @@ dz2=(dz(2:Nz)+dz(1:Nz-1))/2D0
             
         end do
         
-        if (two_comp) then
+        if (AN) then
             chem_1%names_vapor=names_vapor_syst_readin(:,1)
+        ENDIF
+        if (AD) then    
             chem_2%names_vapor=names_vapor_syst_readin(:,2)
+        ENDIF
+        if (IiIo) then
             chem_3%names_vapor=names_vapor_syst_readin(:,3)
         end if    
         
-        if (three_comp) then
+        if (AMsD) then
             chem_4%names_vapor=names_vapor_syst_readin_3comp(:,1)
         end if   
     
@@ -2199,14 +2227,29 @@ IF(nucleation_index==1) THEN
         ipr=q_ion(j)*1D6 ! Ion production rate (ions/m^3/s)
         m_p=(dens_p(j,:)*pi*d_p(j,:)**3D0)/6D0
         
-        if (two_comp) then
+        ! if (two_comp) then
+        if (AN) then
             c_clusters1=c_clusters_n(j,:)
+        end if  
+        
+        if (AD) then
             c_clusters2=c_clusters_d(j,:)
+        end if  
+        
+        if (IiIo) then
             c_clusters3=c_clusters_i(j,:)
-        end if    
-        if (three_comp)then
+        end if  
+        
+        if (AMsD) then
             c_clusters4=c_clusters_m(j,:)
-        end if
+        end if  
+        
+        !     c_clusters2=c_clusters_d(j,:)
+        !     c_clusters3=c_clusters_i(j,:)
+        ! end if    
+        ! if (three_comp)then
+        !     c_clusters4=c_clusters_m(j,:)
+        ! end if
 
         N_bins1=N_bins(j,:)
         
@@ -2216,30 +2259,85 @@ IF(nucleation_index==1) THEN
                 conc(j,ind_dma), conc(j,ind_NH3),conc(j,ind_HIO3), conc(j,ind_HIO2),conc(j,ind_MSA), Jnucl_N(j), Jnucl_D(j), Jnucl_I(j), Jnucl_Ms(j), &
                 diameter_acdc,diameter_acdcDMA,diameter_acdcHIO3,diameter_acdcMSA, CS_H2SO4(j),Ts(j,tr),Ps(j,tr),ipr,dt, d, d_p(j,:),&
                 m_p, N_bins1,Mx, qX, n_evap(j), comp_evap(j,:), clustering_systems, c_clusters1, c_clusters2, c_clusters3, c_clusters4,j,&
-                l_condensation_evap,l_coagulation_loss,three_comp, two_comp)
+                l_condensation_evap,l_coagulation_loss,three_comp, two_comp, AN, AD, IiIo, AMsD)
 
                 !!! check the right bins for the outgrowing clusters to be placed in
                 !!!! AN system
-                if (two_comp) then
+                if (AN) then
                     Mx_chem1(1) =Mx(1)
                     Mx_chem1(2) =Mx(4)
                     qX_chem1(1) =qX(1)
                     qX_chem1(2) =qX(4)
-
-                    !!AD system
+                    
+                    do kk=1, chem_1%nclust_out
+                        ! volume_chem1=real(chem_1%clust_out_molec(kk,:),KIND=dp)
+                        
+                        volume_chem1 = sum(real(chem_1%clust_out_molec(kk,:),KIND=dp)/Na*Mx_chem1(:)/qX_chem1(:))
+                        ! write(*,*) kk, Mx_chem1, qX_chem1
+                        DO ii=2,nr_bins
+                            IF (volume_chem1 .LT. vp(ii)) THEN
+                                chem_1%ind_out_bin(kk)=ii-1
+                                EXIT
+                            END IF
+                        END DO
+                        IF (chem_1%ind_out_bin(kk) .EQ. 0) THEN
+                            WRITE(*,*) 'Could not find aerosol bin for outgrown cluster of composition',chem_1%clust_out_molec(i,:)
+                            STOP
+                            
+                        END IF
+                    end do
+                    
+                end if   
+                
+                !!AD system
+                if (AD) then  
+                    write(*,*) 'here l2261'
                     Mx_chem2(1)=Mx(1)
                     Mx_chem2(2)=Mx(11)
                     qX_chem2(1) =qX(1)
                     qX_chem2(2) =qX(11)
+
+                    do kk=1, chem_2%nclust_out
+                        volume_chem2 = sum(real(chem_2%clust_out_molec(kk,:),KIND=dp)/Na*Mx_chem2(:)/qX_chem2(:))
+                        ! write(*,*) volume_chem2
+                        DO ii=2,nr_bins
+                            IF (volume_chem2 .LT. vp(ii)) THEN
+                                chem_2%ind_out_bin(kk)=ii-1
+                                EXIT
+                            END IF
+                        END DO
+                        IF (chem_2%ind_out_bin(kk) .EQ. 0) THEN
+                            WRITE(*,*) 'Could not find aerosol bin for outgrown cluster of composition',chem_2%clust_out_molec(i,:)
+                            STOP
                     
+                        END IF
+                    end do
+
+                end if     
                     !!IiIo system
+                if (IiIo) then    
                     Mx_chem3(1)=Mx(10)
                     Mx_chem3(2)=Mx(12)
                     qX_chem3(1) =qX(10)
                     qX_chem3(2) =qX(12) !! assumed same as HIO3
+                   
+                    do kk=1, chem_3%nclust_out
+                        volume_chem3 = sum(real(chem_3%clust_out_molec(kk,:),KIND=dp)/Na*Mx_chem3(:)/qX_chem3(:))
+                        DO ii=2,nr_bins
+                            IF (volume_chem3 .LT. vp(ii)) THEN
+                                chem_3%ind_out_bin(kk)=ii-1
+                                EXIT
+                            END IF
+                        END DO
+                        IF (chem_3%ind_out_bin(kk) .EQ. 0) THEN
+                            WRITE(*,*) 'Could not find aerosol bin for outgrown cluster of composition',chem_3%clust_out_molec(i,:)
+                            STOP
+                            
+                        END IF
+                    end do
                 end if 
                 !!SA-MSA-DMA
-                if (three_comp) then
+                if (AMsD) then
                     Mx_chem4(1)=Mx(1)
                     Mx_chem4(2)=Mx(9)
                     Mx_chem4(3)=Mx(11)
@@ -2264,77 +2362,80 @@ IF(nucleation_index==1) THEN
 
                 end if
 
-                if (two_comp) then
+                !if (two_comp) then
 
-                    do kk=1, chem_1%nclust_out
-                        ! volume_chem1=real(chem_1%clust_out_molec(kk,:),KIND=dp)
+                !     do kk=1, chem_1%nclust_out
+                !         ! volume_chem1=real(chem_1%clust_out_molec(kk,:),KIND=dp)
                     
-                        volume_chem1 = sum(real(chem_1%clust_out_molec(kk,:),KIND=dp)/Na*Mx_chem1(:)/qX_chem1(:))
-                        ! write(*,*) kk, Mx_chem1, qX_chem1
-                        DO ii=2,nr_bins
-                            IF (volume_chem1 .LT. vp(ii)) THEN
-                                chem_1%ind_out_bin(kk)=ii-1
-                                EXIT
-                            END IF
-                        END DO
-                        IF (chem_1%ind_out_bin(kk) .EQ. 0) THEN
-                            WRITE(*,*) 'Could not find aerosol bin for outgrown cluster of composition',chem_1%clust_out_molec(i,:)
-                            STOP
+                !         volume_chem1 = sum(real(chem_1%clust_out_molec(kk,:),KIND=dp)/Na*Mx_chem1(:)/qX_chem1(:))
+                !         ! write(*,*) kk, Mx_chem1, qX_chem1
+                !         DO ii=2,nr_bins
+                !             IF (volume_chem1 .LT. vp(ii)) THEN
+                !                 chem_1%ind_out_bin(kk)=ii-1
+                !                 EXIT
+                !             END IF
+                !         END DO
+                !         IF (chem_1%ind_out_bin(kk) .EQ. 0) THEN
+                !             WRITE(*,*) 'Could not find aerosol bin for outgrown cluster of composition',chem_1%clust_out_molec(i,:)
+                !             STOP
         
-                        END IF
-                    end do
+                !         END IF
+                !     end do
 
-                    do kk=1, chem_2%nclust_out
-                        volume_chem2 = sum(real(chem_2%clust_out_molec(kk,:),KIND=dp)/Na*Mx_chem2(:)/qX_chem2(:))
-                        ! write(*,*) volume_chem2
-                        DO ii=2,nr_bins
-                            IF (volume_chem2 .LT. vp(ii)) THEN
-                                chem_2%ind_out_bin(kk)=ii-1
-                                EXIT
-                            END IF
-                        END DO
-                        IF (chem_2%ind_out_bin(kk) .EQ. 0) THEN
-                            WRITE(*,*) 'Could not find aerosol bin for outgrown cluster of composition',chem_2%clust_out_molec(i,:)
-                            STOP
+                !     do kk=1, chem_2%nclust_out
+                !         volume_chem2 = sum(real(chem_2%clust_out_molec(kk,:),KIND=dp)/Na*Mx_chem2(:)/qX_chem2(:))
+                !         ! write(*,*) volume_chem2
+                !         DO ii=2,nr_bins
+                !             IF (volume_chem2 .LT. vp(ii)) THEN
+                !                 chem_2%ind_out_bin(kk)=ii-1
+                !                 EXIT
+                !             END IF
+                !         END DO
+                !         IF (chem_2%ind_out_bin(kk) .EQ. 0) THEN
+                !             WRITE(*,*) 'Could not find aerosol bin for outgrown cluster of composition',chem_2%clust_out_molec(i,:)
+                !             STOP
                     
-                        END IF
-                    end do
+                !         END IF
+                !     end do
                     
-                    do kk=1, chem_3%nclust_out
-                        volume_chem3 = sum(real(chem_3%clust_out_molec(kk,:),KIND=dp)/Na*Mx_chem3(:)/qX_chem3(:))
-                        DO ii=2,nr_bins
-                            IF (volume_chem3 .LT. vp(ii)) THEN
-                                chem_3%ind_out_bin(kk)=ii-1
-                                EXIT
-                            END IF
-                        END DO
-                        IF (chem_3%ind_out_bin(kk) .EQ. 0) THEN
-                            WRITE(*,*) 'Could not find aerosol bin for outgrown cluster of composition',chem_3%clust_out_molec(i,:)
-                            STOP
+                !     do kk=1, chem_3%nclust_out
+                !         volume_chem3 = sum(real(chem_3%clust_out_molec(kk,:),KIND=dp)/Na*Mx_chem3(:)/qX_chem3(:))
+                !         DO ii=2,nr_bins
+                !             IF (volume_chem3 .LT. vp(ii)) THEN
+                !                 chem_3%ind_out_bin(kk)=ii-1
+                !                 EXIT
+                !             END IF
+                !         END DO
+                !         IF (chem_3%ind_out_bin(kk) .EQ. 0) THEN
+                !             WRITE(*,*) 'Could not find aerosol bin for outgrown cluster of composition',chem_3%clust_out_molec(i,:)
+                !             STOP
                             
-                        END IF
-                    end do
-                end if
+                !         END IF
+                !     end do
+                ! end if
                 
                 ! clust_firstcall=.FALSE.             
                 if (l_coagulation_loss) then
                     write(*,*) 'in here'
-                    if (two_comp) then 
+                    if (AN) then 
                         DO i=1,chem_1%nclust_syst
                             chem_1%c_p_clust(1,i) = REAL(chem_1%clust_molec(i,1),KIND=dp)
                             chem_1%c_p_clust(4,i) = REAL(chem_1%clust_molec(i,2),KIND=dp)
                             chem_1%v_clust(i)=SUM(chem_1%c_p_clust(index_dry,i)/Na*MX(index_dry)/qX(index_dry)) ! m^3
                         END DO
                         ! write(*,*)  sum(REAL(chem_1%clust_molec(:,1),KIND=dp)),  sum(REAL(chem_1%clust_molec(:,2),KIND=dp))
-                        
-                        
+                    end if   
+                     
+                    if (AD) then 
                         DO i=1,chem_2%nclust_syst
                             chem_2%c_p_clust(1,i) = REAL(chem_2%clust_molec(i,1),KIND=dp)
                             chem_2%c_p_clust(11,i) = REAL(chem_2%clust_molec(i,2),KIND=dp)
                             chem_2%v_clust(i)=SUM(chem_2%c_p_clust(index_dry,i)/Na*MX(index_dry)/qX(index_dry)) ! m^3
                         END DO
-                        write(*,*) ,sum(REAL(chem_2%clust_molec(:,1),KIND=dp)),  sum(REAL(chem_2%clust_molec(:,2),KIND=dp))
-                        
+                        ! write(*,*) ,sum(REAL(chem_2%clust_molec(:,1),KIND=dp)),  sum(REAL(chem_2%clust_molec(:,2),KIND=dp))
+                    end if
+
+                    if (IiIo) then 
                         DO i=1,chem_3%nclust_syst
                             chem_3%c_p_clust(10,i) = REAL(chem_3%clust_molec(i,1),KIND=dp)
                             chem_3%c_p_clust(12,i) = REAL(chem_3%clust_molec(i,2),KIND=dp)
@@ -2342,7 +2443,7 @@ IF(nucleation_index==1) THEN
                         END DO
                     end if 
                     
-                    if (three_comp) then
+                    if (AMsD) then
                         DO i=1,chem_4%nclust_syst
                             chem_4%c_p_clust(1,i) = REAL(chem_4%clust_molec(i,1),KIND=dp)
                             chem_4%c_p_clust(9,i) = REAL(chem_4%clust_molec(i,2),KIND=dp)
@@ -2350,6 +2451,7 @@ IF(nucleation_index==1) THEN
                             chem_4%v_clust(i)=SUM(chem_4%c_p_clust(index_dry,i)/Na*MX(index_dry)/qX(index_dry)) ! m^3
                         END DO
                     end if
+                
                 end if
                 
                 ! write(*,*) 'l2302'
@@ -2364,7 +2466,7 @@ IF(nucleation_index==1) THEN
                 conc(j,ind_dma), conc(j,ind_NH3),conc(j,ind_HIO3), conc(j,ind_HIO2),conc(j,ind_MSA), Jnucl_N(j), Jnucl_D(j), Jnucl_I(j), Jnucl_Ms(j), &
                 diameter_acdc,diameter_acdcDMA,diameter_acdcHIO3,diameter_acdcMSA, CS_H2SO4(j),Ts(j,tr),Ps(j,tr),ipr,dt, d, d_p(j,:),&
                 m_p, N_bins1,Mx, qX, n_evap(j), comp_evap(j,:), clustering_systems, c_clusters1, c_clusters2, c_clusters3,c_clusters4, j,&
-                l_condensation_evap,l_coagulation_loss,three_comp, two_comp)
+                l_condensation_evap,l_coagulation_loss,three_comp, two_comp, AN, AD, IiIo, AMsD)
                 
             end if 
             
@@ -2374,18 +2476,22 @@ IF(nucleation_index==1) THEN
             
             
             if (l_condensation_evap) then
-                if (two_comp) then
-                    c_p(j,1,:) = c_p(j,1,:)+(chem_1%conc_coag_molec(:,1)+chem_2%conc_coag_molec(:,1))*1D-6 !! H2SO4
+                if (AN) then
+                    c_p(j,1,:) = c_p(j,1,:)+(chem_1%conc_coag_molec(:,1))*1D-6 !! H2SO4
                     c_p(j,4,:) = c_p(j,4,:)+chem_1%conc_coag_molec(:,2)*1D-6 !!! NH3
+                END If
+                if (AD) then    
+                    c_p(j,1,:) = c_p(j,1,:)+(chem_2%conc_coag_molec(:,1))*1D-6 !! H2SO4
                     c_p(j,11,:) = c_p(j,11,:)+chem_2%conc_coag_molec(:,2)*1D-6  !!! DMA
+                end if
+                    if (IiIo) then    
                     c_p(j,10,:) = c_p(j,10,:)+chem_3%conc_coag_molec(:,1)*1D-6  !!! HIO3
                     c_p(j,12,:) = c_p(j,12,:)+chem_3%conc_coag_molec(:,2)*1D-6  !!! HIO2
                 end if    
-                if (three_comp) then 
+                if (AMsD) then 
                     c_p(j,1,:) = c_p(j,1,:)+(chem_4%conc_coag_molec(:,1))*1D-6 !! H2SO4
                     c_p(j,9,:) = c_p(j,9,:)+chem_4%conc_coag_molec(:,2)*1D-6 !!! NH3
-                    c_p(j,11,:) = c_p(j,11,:)+chem_4%conc_coag_molec(:,3)*1D-6 !!! NH3
-                    
+                    c_p(j,11,:) = c_p(j,11,:)+chem_4%conc_coag_molec(:,3)*1D-6 !!! NH3   
                 end if
                 
                 N_bins1=N_bins(j,:); V_bins1=V_bins(j,:); d_p1=d_p(j,:); dp_dry1=dp_dry(j,:)
@@ -2418,54 +2524,55 @@ IF(nucleation_index==1) THEN
        
 
         !!!! update cluster and vapor concentration here
-        c_clusters_n(j,:)=c_clusters1
-        c_clusters_d(j,:)=c_clusters2
-        c_clusters_i(j,:)=c_clusters3
-
-        if (three_comp)then
-            c_clusters_m(j,:)=c_clusters4
+        IF (AN)then
+            c_clusters_n(j,:)=c_clusters1
+            DO ii=1,chem_1%nclust_out
+                !!! for chemistry 1 H2SO4-NH3
+                
+                i = chem_1%ind_out_bin(ii)
+    
+                N_bins(j,i) = N_bins(j,i)+chem_1%conc_out_all(ii)
+                
+                c_p(j,1,i) = c_p(j,1,i)+real(chem_1%clust_out_molec(ii,1),KIND=dp)*chem_1%conc_out_all(ii)*1D-6
+                c_p(j,4,i) = c_p(j,4,i)+real(chem_1%clust_out_molec(ii,2),KIND=dp)*chem_1%conc_out_all(ii)*1D-6
+                
+            end do
         end if
 
-        DO ii=1,chem_1%nclust_out
-            !!! for chemistry 1 H2SO4-NH3
-            
-            i = chem_1%ind_out_bin(ii)
+        IF (AD)then    
+            c_clusters_d(j,:)=c_clusters2
+            DO ii=1,chem_2%nclust_out
+                !!! for chemistry 2 H2SO4-DMA
+    
+                i = chem_2%ind_out_bin(ii)
+    
+                N_bins(j,i) = N_bins(j,i)+chem_2%conc_out_all(ii)
+                ! write(*,*) 
+                c_p(j,1,i) = c_p(j,1,i)+real(chem_2%clust_out_molec(ii,1),KIND=dp)*chem_2%conc_out_all(ii)*1D-6
+                c_p(j,11,i) = c_p(j,11,i)+real(chem_2%clust_out_molec(ii,2),KIND=dp)*chem_2%conc_out_all(ii)*1D-6
+                
+                ! c_p(j,7,i) = c_p(j,7,i)+init_rel_water*SUM(comp_out_all(ii,:))*c_out_all(ii)*1D-6
+            end do
+        end if
 
-            N_bins(j,i) = N_bins(j,i)+chem_1%conc_out_all(ii)
-            
-            c_p(j,1,i) = c_p(j,1,i)+real(chem_1%clust_out_molec(ii,1),KIND=dp)*chem_1%conc_out_all(ii)*1D-6
-            c_p(j,4,i) = c_p(j,4,i)+real(chem_1%clust_out_molec(ii,2),KIND=dp)*chem_1%conc_out_all(ii)*1D-6
-            
-        end do
-          
-        DO ii=1,chem_2%nclust_out
-            !!! for chemistry 2 H2SO4-DMA
-
-            i = chem_2%ind_out_bin(ii)
-
-            N_bins(j,i) = N_bins(j,i)+chem_2%conc_out_all(ii)
-            ! write(*,*) 
-            c_p(j,1,i) = c_p(j,1,i)+real(chem_2%clust_out_molec(ii,1),KIND=dp)*chem_2%conc_out_all(ii)*1D-6
-            c_p(j,11,i) = c_p(j,11,i)+real(chem_2%clust_out_molec(ii,2),KIND=dp)*chem_2%conc_out_all(ii)*1D-6
-            
-            ! c_p(j,7,i) = c_p(j,7,i)+init_rel_water*SUM(comp_out_all(ii,:))*c_out_all(ii)*1D-6
-        end do
-        
-        ! !!! for HIO3-HIO2 chemistry 3
-        DO ii=1,chem_3%nclust_out
-            !!! for chemistry 2 H2SO4-DMA
-
-            i = chem_3%ind_out_bin(ii)
-
-            N_bins(j,i) = N_bins(j,i)+chem_3%conc_out_all(ii)
-            ! write(*,*) 
-            c_p(j,10,i) = c_p(j,10,i)+real(chem_3%clust_out_molec(ii,1),KIND=dp)*chem_3%conc_out_all(ii)*1D-6
-            c_p(j,12,i) = c_p(j,12,i)+real(chem_3%clust_out_molec(ii,2),KIND=dp)*chem_3%conc_out_all(ii)*1D-6
-            
-            ! c_p(j,7,i) = c_p(j,7,i)+init_rel_water*SUM(comp_out_all(ii,:))*c_out_all(ii)*1D-6
-        end do
-        
-        if (three_comp) then
+        IF (IiIo)then
+            c_clusters_i(j,:)=c_clusters3
+            DO ii=1,chem_3%nclust_out
+                !!! for chemistry 2 H2SO4-DMA
+    
+                i = chem_3%ind_out_bin(ii)
+    
+                N_bins(j,i) = N_bins(j,i)+chem_3%conc_out_all(ii)
+                ! write(*,*) 
+                c_p(j,10,i) = c_p(j,10,i)+real(chem_3%clust_out_molec(ii,1),KIND=dp)*chem_3%conc_out_all(ii)*1D-6
+                c_p(j,12,i) = c_p(j,12,i)+real(chem_3%clust_out_molec(ii,2),KIND=dp)*chem_3%conc_out_all(ii)*1D-6
+                
+                ! c_p(j,7,i) = c_p(j,7,i)+init_rel_water*SUM(comp_out_all(ii,:))*c_out_all(ii)*1D-6
+            end do
+        end if 
+           
+        if (AMsD)then
+            c_clusters_m(j,:)=c_clusters4
             DO ii=1,chem_4%nclust_out
                 !!! for chemistry 2 H2SO4-DMA
 
@@ -2479,13 +2586,15 @@ IF(nucleation_index==1) THEN
                 
                 ! c_p(j,7,i) = c_p(j,7,i)+init_rel_water*SUM(comp_out_all(ii,:))*c_out_all(ii)*1D-6
             end do
-        end if    
+        end if
+
+        ! end if    
     end do
 
     ! write(*,*) real(chem_1%clust_out_molec,KIND=dp)
-    write(*,*) 'l2359 nbins ', sum(N_bins(1,1:10))!, sum(chem_1%conc_coag_clust), sum(chem_2%conc_coag_clust) , sum(comp_evap(:,1),dim=1), sum(comp_evap(:,4),dim=1), sum(comp_evap(:,11),dim=1)
+    write(*,*) 'l2359 SUM(nbins(1:10)) ', sum(N_bins(1,1:10))!, sum(chem_1%conc_coag_clust), sum(chem_2%conc_coag_clust) , sum(comp_evap(:,1),dim=1), sum(comp_evap(:,4),dim=1), sum(comp_evap(:,11),dim=1)
     ! write(*,*) 'l2347 [HIO2] = ', conc(1,ind_HIO2),'',conc(1,ind_HIO3),'',conc(1,ind_H2SO4),'',conc(1,ind_DMA),'',conc(1,ind_NH3)
-    write(*,*) 'l2347 jNUCL = ', sum(Jnucl_D), sum(Jnucl_I), sum(Jnucl_Ms), sum(Jnucl_N)
+    write(*,*) 'l2347 SUM(jNUCL) = ','AN:','', sum(Jnucl_N), 'AD:', sum(Jnucl_D), 'IiIo:', sum(Jnucl_I), 'AMsD:', sum(Jnucl_Ms)
 end if
  
     ! Dry and wet deposition of particles                         !
