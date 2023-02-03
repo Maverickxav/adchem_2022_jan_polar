@@ -355,8 +355,8 @@ PROGRAM adchem1D_new
     REAL(DP) :: cHIO2(nz)
     ! REAL(dp), ALLOCATABLE :: c_p_clust1(:,:),c_p_clust2(:,:), v_clust1(:),v_clust2(:)
     
-    l_condensation_evap=.True.
-    l_coagulation_loss=.False.
+    l_condensation_evap=.False.
+    l_coagulation_loss=.True.
 
   
     comp_evap=0D0

@@ -11,7 +11,7 @@ CHEM_DIR=$(CHEM_MAIN_DIR)/mcm_PRAMv1_DMS_I2O5_HIO2
 ACDC_DIR=$(ACDC_MAIN_DIR)/Clusterin_multiple_chem_including_HIO3
 NAC := $(shell find ${ACDC_DIR}/cluster_chem_* -maxdepth 0 -type d |wc -l|sed 's/ //g')
 
-CLUSTER_CHEM_NUM := $(shell seq $(NAC))
+CLUSTER_CHEM_NUM := 1 2 3 #$(shell seq $(NAC))
 # Directories to search files in (in addition to the current one)
 
 # VPATH = $(OBJDIR):chemistry_DMS_HM_20201222:$(ACDC_DIR):$(foreach n,$(CLUSTER_CHEM_NUM),$(ACDC_DIR)/cluster_chem_$(n):)

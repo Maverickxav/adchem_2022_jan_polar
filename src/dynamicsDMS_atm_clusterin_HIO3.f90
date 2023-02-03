@@ -855,8 +855,6 @@ END SUBROUTINE sea_spray
 
 
     !------------------------------------------------------!
-    ! Coagulation                                          !
-    !------------------------------------------------------!
 SUBROUTINE coagulation_clusterin(N_bins,V_bins,c_p,c_p_backg,d_p,dp_dry,dt,dens_p,MX,qX,chem_1,chem_2,chem_3,n_clustering_vapors)
 
   REAL(dp), DIMENSION(nr_bins), INTENT(inout) :: N_bins
@@ -879,7 +877,7 @@ SUBROUTINE coagulation_clusterin(N_bins,V_bins,c_p,c_p_backg,d_p,dp_dry,dt,dens_
 
   !! for cluster 
   type(clustering_mod), intent(in):: chem_1, chem_2,chem_3
-  integer :: n_clustering_vapors
+  integer,intent(in) :: n_clustering_vapors
   INTEGER :: nclust(n_clustering_vapors)                            ! Number of clusters
   REAL(dp), allocatable :: dN_coag_clust(:,:), c_p_single_clust(:,:), Vp_clust(:) ! Concentrations, compositions and volumes of coagulated clusters
   REAL(dp), DIMENSION(nr_bins+1) :: dN                     ! Changes in aerosol number and composition; note: dN, not dNdt as the changes are already integrated by
@@ -980,7 +978,6 @@ SUBROUTINE coagulation_clusterin(N_bins,V_bins,c_p,c_p_backg,d_p,dp_dry,dt,dens_
   d_p=(vp_wet*6D0/pi)**(1D0/3D0) ! Dry particle diameters
 
 END SUBROUTINE coagulation_clusterin
-
 !!!! original coagulation
 
 SUBROUTINE coagulation(N_bins,V_bins,c_p,d_p,dp_dry,dt,T,p,dens_p,MX,qX)

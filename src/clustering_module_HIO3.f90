@@ -102,7 +102,7 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, clust_firstcall, n_clust
     cNH3   = cNH3   + comp_evap(4)
     cDMA   = cDMA   + comp_evap(11)
     cHIO3  = cHIO3  + comp_evap(10)
-    cHIO2  = cHIO3  + comp_evap(12)
+    cHIO2  = cHIO2  + comp_evap(12)
  
     ! write(*,*) 'in clusterin module nconc_evap1 and 2' , nconc_evap1, nconc_evap2,layer
  
@@ -178,12 +178,6 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, clust_firstcall, n_clust
         c_out_bin=chem_2%conc_out_bin,comp_out_bin=chem_2%comp_out_bin,&
         c_out_all=chem_2%conc_out_all,clust_out_molec=chem_2%clust_out_molec)
         
-        !     CALL cluster_dynamics_2(chem_2%names_vapor,chem_2%conc_vapor,CS_H2SO4,T,ipr,dt,0.d0,&
-        ! &    Jnucl_D_out,dia_dma,c_inout=c_clusters2,naero=nr_bins,mp_aero=m_p,c_aero=N_bins_in,dp_aero_lim=d ,dp_aero=d_p,pres=Press, &
-        ! c_evap=n_evap,nmols_evap=chem_2%nmols_evap,&
-        ! c_coag_clust=chem_2%conc_coag_clust,clust_molec=chem_2%clust_molec,&
-        ! c_out_bin=chem_2%conc_out_bin,comp_out_bin=chem_2%comp_out_bin,&
-        ! c_out_all=chem_2%conc_out_all,clust_out_molec=chem_2%clust_out_molec)
 
     else
         write(*,*) 'No aerosol-cluster feedback selected'

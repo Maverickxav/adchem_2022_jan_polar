@@ -6,6 +6,7 @@ module acdc_datatypes
     implicit NONE
     
     INTEGER                                :: n_clustering_vapors=2         ! Number of clustering vapors
+    INTEGER                                :: n_clustering_vapors_3comp=3         ! Number of clustering vapors
     logical                                :: use_clustering_plugin        !! true if clusterin plugin is used 
     logical                                :: clust_evap, clust_firstcall
 
