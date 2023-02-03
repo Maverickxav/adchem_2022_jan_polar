@@ -368,7 +368,7 @@ PROGRAM adchem1D_new
     AN=.TRUE.
     AD=.TRUE.
     IiIo=.false.
-    AMsD=.true.
+    AMsD=.false.
 
     comp_evap=0D0
     !! condensation update
