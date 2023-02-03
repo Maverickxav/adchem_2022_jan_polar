@@ -367,7 +367,7 @@ PROGRAM adchem1D_new
 
     AN=.TRUE.
     AD=.TRUE.
-    IiIo=.TRUE.
+    IiIo=.false.
     AMsD=.true.
 
     comp_evap=0D0
@@ -2291,7 +2291,7 @@ IF(nucleation_index==1) THEN
                 
                 !!AD system
                 if (AD) then  
-                    write(*,*) 'here l2261'
+                    ! write(*,*) 'here l2261'
                     Mx_chem2(1)=Mx(1)
                     Mx_chem2(2)=Mx(11)
                     qX_chem2(1) =qX(1)
