@@ -39,7 +39,7 @@ OPTS1 = -ffree-line-length-none -cpp -I$(NETCDF)/include -J$(OBJDIR) -I$(OBJDIR)
 
 #this runs 2x faster, but slower compilation
 # OPTS = -ffree-line-length-none -cpp -I$(NETCDF)/include -J$(OBJDIR) -I$(OBJDIR) -fcheck=all -ffpe-trap=invalid,zero,overflow -Os 
-OPTS = -ffree-line-length-none -cpp -I$(NETCDF)/include -J$(OBJDIR) -I$(OBJDIR) -fcheck=all -ffpe-trap=invalid,zero,overflow -Os	
+OPTS = -ffree-line-length-none -cpp -I$(NETCDF)/include -J$(OBJDIR) -I$(OBJDIR) -fcheck=all -ffpe-trap=invalid,zero,overflow -O3	
 # OPT = -ffpe-trap=invalid,zero,overflow
 
 CHEM_OPTS = $(OPTS1)

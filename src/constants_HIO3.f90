@@ -91,8 +91,8 @@ MODULE constants
  REAL(dp), PARAMETER :: qH2O=1000.   ! density of water (kg/m^3)
  REAL(dp), PARAMETER :: qMetal=2000. ! density of Metal (kg/m^3)
  REAL(dp), PARAMETER :: qMSA=1480. ! density of HIO3(kg/m^3)
- REAL(dp), PARAMETER :: qHIO3=2000. ! density of HIO3 in liquid form (assumed) (kg/m^3)
- REAL(dp), PARAMETER :: qHIO2=2000. ! density of HIO3 in liquid form (assumed) (kg/m^3)
+ REAL(dp), PARAMETER :: qHIO3=4630. ! density of HIO3 in liquid form (assumed) (kg/m^3)
+ REAL(dp), PARAMETER :: qHIO2=4630. ! density of HIO3 in liquid form (assumed) (kg/m^3)
  
  
  

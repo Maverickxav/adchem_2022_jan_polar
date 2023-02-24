@@ -101,7 +101,8 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, chem_4, clust_firstcall,
     IMPLICIT NONE
 
     type(clustering_mod), intent(inout),optional ::chem_1, chem_2,chem_3, chem_4
-    REAL(DP) :: c_dma , C_ACID, C_BASE, c_Ii, c_IO, sa_old, dm_old, am_old, hio2old, hio3old, nconc_evap1, nconc_evap2, nconc_evap3, nconc_evap4
+    REAL(DP) :: c_dma , C_ACID, C_BASE, c_Ii, c_IO, sa_old, dm_old, am_old, hio2old, hio3old, nconc_evap1,&
+                 c_msa,    nconc_evap2, nconc_evap3, nconc_evap4
     logical, intent(inout) :: clust_firstcall
     integer, intent(in) :: n_clustering_vapors, nr_bins, clustering_systems, layer, n_clustering_vapors_3comp
     REAL(DP), intent(inout), optional :: cH2SO4,cDMA, cNH3,cHIO2, cHIO3 ,cMSA
@@ -109,8 +110,8 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, chem_4, clust_firstcall,
     REAL(DP), intent(in) :: CS_H2SO4,T,press,ipr,dt, d_p(:),d(nr_bins+1), N_bins_in(:), m_p(nr_bins)
     REAL(dp), INTENT(in) :: MX(NSPEC_P),qX(NSPEC_P)
     REAL(DP), intent(in):: n_evap, comp_evap(:)
-    REAL(dp), intent(inout), optional ::  c_clusters1(:),c_clusters2(:),c_clusters3(:)
-    real(dp), intent(inout), optional :: c_clusters4(:)
+    REAL(dp), intent(inout), optional ::  c_clusters1(:),c_clusters2(:),c_clusters3(:),c_clusters4(:)
+    
     ! real(dp), optional :: 
     
     integer:: i, kk    
@@ -150,7 +151,8 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, chem_4, clust_firstcall,
         c_DMA  = cDMA*1D6
         c_Ii   = cHIO3*1D6 
         c_IO   = cHIO2*1D6
-
+        c_MSA  = cMSA*1d6
+        
     if (AN) then     
         !cH2SO4 = cH2SO4 + comp_evap(1)
         cNH3   = cNH3   + comp_evap(4)
@@ -166,11 +168,15 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, chem_4, clust_firstcall,
     if (AMsD) THEN
         !cH2SO4 = cH2SO4 + comp_evap(1)
         cMSA   = cMSA   + comp_evap(9)
-        cDMA   = cDMA   + comp_evap(11)
+        ! cDMA   = cDMA   + comp_evap(11)
     end if
     if (AN .or. AD .or. AMsD )then 
         ! write(*,*) 'here'
         cH2SO4 = cH2SO4 + comp_evap(1)
+    end if
+    if ( AD .or. AMsD )then 
+        ! write(*,*) 'here'
+        cDMA = cDMA + comp_evap(1)
     end if
     ! ! write(*,*) 'in clusterin module nconc_evap1 and 2' , nconc_evap1, nconc_evap2,layer
  
@@ -240,10 +246,10 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, chem_4, clust_firstcall,
             
             cH2SO4=chem_1%conc_vapor(1)*1d-6
             cNH3=chem_1%conc_vapor(2)*1d-6
-        end if
+    end if
         !!!!!!!!!!!!!!!!!!!! end AN system!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        if (AD) then
+    if (AD) then
             !! update c_acid for AD system
             ! write(*,*) 'here AD'
             c_acid=cH2SO4*1D6 ! from molec/cm3  -> molec/m3 
@@ -265,13 +271,13 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, chem_4, clust_firstcall,
             c_out_all=chem_2%conc_out_all,clust_out_molec=chem_2%clust_out_molec)
             ! write(*,*) , sum(REAL(chem_2%clust_molec(:,1),KIND=dp)),  sum(REAL(chem_2%clust_molec(:,2),KIND=dp))
         elseif (l_coag_loss) then
-        
+
             CALL cluster_dynamics_2(chem_2%names_vapor,chem_2%conc_vapor,CS_H2SO4,T,ipr,dt,0.d0,&
-            &    Jnucl_D_out,dia_dma,c_inout=c_clusters2,naero=nr_bins,mp_aero=m_p,c_aero=N_bins_in,dp_aero_lim=d ,dp_aero=d_p,pres=Press, &
-            c_evap=n_evap,nmols_evap=chem_2%nmols_evap, &
-            c_coag_molec=chem_2%conc_coag_molec,c_coag_clust=chem_2%conc_coag_clust,clust_molec=chem_2%clust_molec,&
+            &    Jnucl_D_out,dia_n,c_inout=c_clusters2, naero=nr_bins,dp_aero_lim=d ,dp_aero=d_p,mp_aero=m_p,c_aero=N_bins_in,pres=Press,&
+            c_evap=n_evap,nmols_evap=chem_2%nmols_evap,&
+            c_coag_clust=chem_2%conc_coag_clust,clust_molec=chem_2%clust_molec,&
             c_out_bin=chem_2%conc_out_bin,comp_out_bin=chem_2%comp_out_bin,&
-            c_out_all=chem_2%conc_out_all,clust_out_molec=chem_2%clust_out_molec)
+            c_out_all=chem_2%conc_out_all,clust_out_molec=chem_2%clust_out_molec) 
             
             ! write(*,*) , sum(REAL(chem_2%clust_molec(:,1),KIND=dp)),  sum(REAL(chem_2%clust_molec(:,2),KIND=dp))
         else
@@ -289,6 +295,7 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, chem_4, clust_firstcall,
         c_Ii   = cHIO3*1D6 
         c_IO   = cHIO2*1D6
         chem_3%conc_vapor=(/c_Ii ,c_Io/)
+        ! write(*,*) 'Here IiIo'
 
         if (l_cond_evap) then
             CALL cluster_dynamics_3(chem_3%names_vapor,chem_3%conc_vapor,CS_H2SO4,T,ipr,dt,0.d0,&
@@ -301,12 +308,13 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, chem_4, clust_firstcall,
             
         elseif (l_coag_loss) then
         
+            
             CALL cluster_dynamics_3(chem_3%names_vapor,chem_3%conc_vapor,CS_H2SO4,T,ipr,dt,0.d0,&
-            &    Jnucl_I_out,dia_hio,c_inout=c_clusters3,naero=nr_bins,mp_aero=m_p,c_aero=N_bins_in,dp_aero_lim=d ,dp_aero=d_p,pres=Press, &
-            c_evap=n_evap,nmols_evap=chem_3%nmols_evap, &
-            c_coag_molec=chem_3%conc_coag_molec,c_coag_clust=chem_3%conc_coag_clust,clust_molec=chem_3%clust_molec,&
+            &    Jnucl_I_out,dia_n,c_inout=c_clusters3, naero=nr_bins,dp_aero_lim=d ,dp_aero=d_p,mp_aero=m_p,c_aero=N_bins_in,pres=Press,&
+            c_evap=n_evap,nmols_evap=chem_3%nmols_evap,&
+            c_coag_clust=chem_3%conc_coag_clust,clust_molec=chem_3%clust_molec,&
             c_out_bin=chem_3%conc_out_bin,comp_out_bin=chem_3%comp_out_bin,&
-            c_out_all=chem_3%conc_out_all,clust_out_molec=chem_3%clust_out_molec)
+            c_out_all=chem_3%conc_out_all,clust_out_molec=chem_3%clust_out_molec) 
             
 
         else
@@ -320,7 +328,12 @@ Subroutine clustering_subroutine(chem_1, chem_2,chem_3, chem_4, clust_firstcall,
     
     if (AMsD) then
 
-        chem_4%conc_vapor=(/cH2SO4*1D6 ,cMSA*1D6, cDMA*1D6/)
+        c_acid=cH2SO4*1D6
+        c_dma=cDMA*1D6
+        c_msa=cMSA*1D6
+        
+        chem_4%conc_vapor=(/C_ACID ,c_msa, c_DMA/)
+        ! chem_4%conc_vapor=(/cH2SO4*1D6 ,cMSA*1D6, cDMA*1D6/)
 
         if (l_cond_evap) then
         

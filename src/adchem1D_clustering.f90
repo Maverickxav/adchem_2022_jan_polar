@@ -31,6 +31,7 @@ PROGRAM adchem1D_new
     IMPLICIT NONE
 
     REAL(dp) :: start_time,finish_time
+    REAL(dp) :: start,finish
     
     ! Variables for atmospheric diffusion calculations:
     REAL(dp), DIMENSION(Nz+1) :: Kz  ! Eddy diffusion coefficients in the vertical direction (0 m - 2000 m)
@@ -2111,6 +2112,7 @@ IF(nucleation_index==1) THEN
     ! sum(conc(:, ind_NH3),dim=1)
     write(*,*) 'l2111 nbins ', sum(N_bins(1,1:10))!, sum(chem_1%conc_coag_clust), sum(chem_2%conc_coag_clust), sum(comp_evap(:,1),dim=1), sum(comp_evap(:,4),dim=1), sum(comp_evap(:,11),dim=1)
 
+    call cpu_time(start)
     DO j=1, nz
         ipr=q_ion(j)*1D6 ! Ion production rate (ions/m^3/s)
         m_p=(dens_p(j,:)*pi*d_p(j,:)**3D0)/6D0
@@ -2269,7 +2271,9 @@ IF(nucleation_index==1) THEN
 
     ! write(*,*) real(chem_1%clust_out_molec,KIND=dp)
     write(*,*) 'l2335 nbins ', sum(N_bins(1,1:10))!, sum(chem_1%conc_coag_clust), sum(chem_2%conc_coag_clust) , sum(comp_evap(:,1),dim=1), sum(comp_evap(:,4),dim=1), sum(comp_evap(:,11),dim=1)
-   
+    call cpu_time(finish)
+    
+    write(*,*) 'Execution time in seconds= ', (finish-start)
 end if
  
     ! Dry and wet deposition of particles                         !

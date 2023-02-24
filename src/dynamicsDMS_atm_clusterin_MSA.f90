@@ -851,7 +851,8 @@ END SUBROUTINE sea_spray
 
 
 
-SUBROUTINE coagulation_clusterin(N_bins,V_bins,c_p,c_p_backg,d_p,dp_dry,dt,dens_p,MX,qX,chem_1,chem_2,chem_3,chem_4,clustering_vapors,three_comp_sys)
+SUBROUTINE coagulation_clusterin(N_bins,V_bins,c_p,c_p_backg,d_p,dp_dry,dt,dens_p,MX,qX,chem_1,chem_2,chem_3,chem_4,clustering_vapors,three_comp_sys, &
+  log_array, ncases)
 
   REAL(dp), DIMENSION(nr_bins), INTENT(inout) :: N_bins
   REAL(dp), DIMENSION(NSPEC_P,nr_bins), INTENT(inout) :: c_p
@@ -869,13 +870,12 @@ SUBROUTINE coagulation_clusterin(N_bins,V_bins,c_p,c_p_backg,d_p,dp_dry,dt,dens_
   REAL(dp), DIMENSION(NSPEC_P,nr_bins) :: c_p_single
  
   
-  INTEGER :: i,j,m,n, ic
+  INTEGER :: i,j,m,n, ic,ff
 
   !! for cluster 
-  type(clustering_mod), intent(in), optional:: chem_1, chem_2,chem_3
-  type(clustering_mod), intent(in), optional :: chem_4
+  type(clustering_mod), intent(in), optional:: chem_1, chem_2,chem_3, chem_4
   integer,intent(in) :: clustering_vapors
-  INTEGER, allocatable :: nclust(:)
+  INTEGER, allocatable :: nclust(:), list_nclust(:)
   INTEGER:: clustering_systems                            ! Number of clusters
   REAL(dp), allocatable :: dN_coag_clust(:,:), c_p_single_clust(:,:), Vp_clust(:) ! Concentrations, compositions and volumes of coagulated clusters
   REAL(dp), DIMENSION(nr_bins+1) :: dN                     ! Changes in aerosol number and composition; note: dN, not dNdt as the changes are already integrated by
@@ -883,6 +883,9 @@ SUBROUTINE coagulation_clusterin(N_bins,V_bins,c_p,c_p_backg,d_p,dp_dry,dt,dens_
   REAL(dp) :: N_bins_old(nr_bins), N_fix, N_fix_tmp,dp_max
   REAL(DP) ::  c_p_coag_cluster(NSPEC_P)
   logical, intent(in):: three_comp_sys
+  logical, intent(in):: log_array(4)
+  integer, intent(in) :: ncases 
+  
 
   dp_max = dp_dry(nr_bins)*dp_dry(nr_bins)/dp_dry(nr_bins-1)
   Vp(1:nr_bins) = (4D0*pi*((dp_dry/2D0))**3D0)/3D0  ! Dry singel particle volume in each size bin m^3.
@@ -892,25 +895,29 @@ SUBROUTINE coagulation_clusterin(N_bins,V_bins,c_p,c_p_backg,d_p,dp_dry,dt,dens_
   !!!! no self coagulation
     dN = 0.
     dcp=0.
+    ff=0
 
     ! c_p_single=c_p!sum(c_p_single,dim=1)
     DO j=1,nr_bins
       c_p_single(:,j) = c_p(:,j)/(N_bins(j)*1D-6) ! concentration of each condensable compound in particle phase in a single particle in each bin
     END DO
     
-    if (three_comp_sys) THEN
-      ! write(*,*) 'l 902 here'
-      clustering_systems=clustering_vapors
-      allocate(nclust(clustering_systems))
-      nclust=(/chem_1%nclust_syst, chem_2%nclust_syst,chem_4%nclust_syst/)
-    else 
-      clustering_systems=clustering_vapors-1
-      allocate(nclust(clustering_systems-1))
-      nclust=(/chem_1%nclust_syst, chem_2%nclust_syst/)
-
-    end if
+    ! allocate(list_nclust(clustering_systems))
+    allocate(nclust(clustering_systems))
     
-    Do ic=1, clustering_systems
+    ! list_nclust=(/chem_1%nclust_syst, chem_2%nclust_syst,chem_3%nclust_syst,chem_4%nclust_syst/)
+
+    ! do i=1,size(log_array)
+    !   if (log_array(i)) then
+    !     ff=ff+1
+    !     nclust(ff)=list_nclust(i)
+    !   end if
+    ! end do
+
+    nclust=(/chem_1%nclust_syst, chem_2%nclust_syst,chem_3%nclust_syst,chem_4%nclust_syst/)
+    ! c_p_single=c_p!sum(c_p_single,dim=1)
+  
+    Do ic=1,2 !1, clustering_systems
     ! Coagulation source:
       if (ic==1) then
         ! write(*,*) 'Here L 262, chem 1'
@@ -918,30 +925,61 @@ SUBROUTINE coagulation_clusterin(N_bins,V_bins,c_p,c_p_backg,d_p,dp_dry,dt,dens_
         vp_clust=chem_1%v_clust
         dN_coag_clust=chem_1%conc_coag_clust
         c_p_single_clust=chem_1%c_p_clust
-        ! write(*,*) sum(Vp_clust),SUM(dN_coag_clust),SUM(c_p_single_clust)
       elseif (ic==2) then
         allocate(dN_coag_clust(nr_bins,nclust(ic)), c_p_single_clust(NSPEC_P,nclust(ic)), Vp_clust(nclust(ic)))
+        ! write(*,*) 'Here L 262, chem 2'
         vp_clust=chem_2%v_clust
         dN_coag_clust=chem_2%conc_coag_clust
         c_p_single_clust=chem_2%c_p_clust
-        ! write(*,*) 'l927'
-        ! write(*,*) sum(Vp_clust),SUM(dN_coag_clust),SUM(c_p_single_clust)
-        ! elseif (ic==3) then
-        !   write(*,*) 'skip HIO3-HIO2 system'
-        ! allocate(dN_coag_clust(nr_bins,nclust(ic)), c_p_single_clust(NSPEC_P,nclust(ic)), Vp_clust(nclust(ic)))
-        ! ! write(*,*) 'Here L 262, chem 2'
-        ! vp_clust=chem_3%v_clust
-        ! dN_coag_clust=chem_3%conc_coag_clust
-        ! c_p_single_clust=chem_3%c_p_clust
-        ! write(*,*) sum(Vp_clust),SUM(dN_coag_clust),SUM(c_p_single_clust)
-        elseif (ic==3) then
-          ! write(*,*) 'Here L 262, chem 2'
-            allocate(dN_coag_clust(nr_bins,nclust(ic)), c_p_single_clust(NSPEC_P,nclust(ic)), Vp_clust(nclust(ic)))
-            vp_clust=chem_4%v_clust
-            dN_coag_clust=chem_4%conc_coag_clust
-            c_p_single_clust=chem_4%c_p_clust  
-            ! write(*,*) sum(Vp_clust),SUM(dN_coag_clust),SUM(c_p_single_clust)
+      elseif (ic==3) then
+        allocate(dN_coag_clust(nr_bins,nclust(ic)), c_p_single_clust(NSPEC_P,nclust(ic)), Vp_clust(nclust(ic)))
+        ! write(*,*) 'Here L 262, chem 3'
+        vp_clust=chem_3%v_clust
+        dN_coag_clust=chem_3%conc_coag_clust
+        c_p_single_clust=chem_3%c_p_clust
+      elseif (ic==4) then
+        allocate(dN_coag_clust(nr_bins,nclust(ic)), c_p_single_clust(NSPEC_P,nclust(ic)), Vp_clust(nclust(ic)))
+        ! write(*,*) 'Here L 262, chem 4'
+        vp_clust=chem_4%v_clust
+        dN_coag_clust=chem_4%conc_coag_clust
+        c_p_single_clust=chem_4%c_p_clust
+        
       end if
+
+    
+    ! Do ic=1, size(nclust)!clustering_systems
+    ! ! Coagulation source:
+    !   if (ic==1) then
+    !     ! write(*,*) 'Here L 262, chem 1'
+    !     ! allocate(dN_coag_clust(nr_bins,nclust(ic)), c_p_single_clust(NSPEC_P,nclust(ic)), Vp_clust(nclust(ic)))
+    !     ! vp_clust=chem_1%v_clust
+    !     ! dN_coag_clust=chem_1%conc_coag_clust
+    !     ! c_p_single_clust=chem_1%c_p_clust
+    !     ! write(*,*) sum(Vp_clust),SUM(dN_coag_clust),SUM(c_p_single_clust)
+    !   ! elseif (ic==2) then
+    !     ! write(*,*) 'Here L 262, chem 2'
+    !     ! allocate(dN_coag_clust(nr_bins,nclust(ic)), c_p_single_clust(NSPEC_P,nclust(ic)), Vp_clust(nclust(ic)))
+    !     ! vp_clust=chem_2%v_clust
+    !     ! dN_coag_clust=chem_2%conc_coag_clust
+    !     ! c_p_single_clust=chem_2%c_p_clust
+    !     ! write(*,*) 'l927'
+    !     ! write(*,*) sum(Vp_clust),SUM(dN_coag_clust),SUM(c_p_single_clust)
+    !     ! elseif (ic==3) then
+    !       ! write(*,*) 'skip HIO3-HIO2 system'
+    !     allocate(dN_coag_clust(nr_bins,nclust(ic)), c_p_single_clust(NSPEC_P,nclust(ic)), Vp_clust(nclust(ic)))
+    !     write(*,*) 'Here L 262, chem 3'
+    !     vp_clust=chem_3%v_clust
+    !     dN_coag_clust=chem_3%conc_coag_clust
+    !     ! c_p_single_clust=chem_3%c_p_clust
+    !     ! write(*,*) sum(Vp_clust),SUM(dN_coag_clust),SUM(c_p_single_clust)
+    !     ! elseif (ic==4) then
+    !       ! write(*,*) 'Here L 262, chem 4'
+    !       !   allocate(dN_coag_clust(nr_bins,nclust(ic)), c_p_single_clust(NSPEC_P,nclust(ic)), Vp_clust(nclust(ic)))
+    !       !   vp_clust=chem_4%v_clust
+    !       !   dN_coag_clust=chem_4%conc_coag_clust
+    !       !   c_p_single_clust=chem_4%c_p_clust  
+    !       !   write(*,*) sum(Vp_clust),SUM(dN_coag_clust),SUM(c_p_single_clust)
+    !   end if
     
       DO j = 1,nr_bins
         DO m = 1,nclust(ic)!nclust
@@ -1643,11 +1681,21 @@ end if !! if flag_clusterin
       END IF
        DO j = 1,nr_bins
         IF (N_bins(j)<1D-6) THEN ! This can occur with the full-stationary method if some particles grow to more than the next particle size bin within one condensation time step
+          IF (N_bins(j)<0D0) THEN
+            WRITE(*,*) 'Neg. conc. in bin ',j,' after cond.:',N_bins(j),' m^-3'
+          END IF
+          
           N_bins(j)=1D-3		
           c_p(:,j)=c_p_backg(:,j)*1D-3;       
-          ! c_p(:,j)=c_p(:,j)*vp_fixed(j)/SUM(c_p(index_dry,j)/Na*MX(index_dry)/qX(index_dry))*N_bins(j)*1D-6   
+          c_p(:,j)=c_p(:,j)*vp_fixed(j)/SUM(c_p(index_dry,j)/Na*MX(index_dry)/qX(index_dry))*N_bins(j)*1D-6   
         END IF
-       
+        DO i = 1,NSPEC_P
+          IF (c_p(i,j)<0D0) THEN
+              WRITE(*,*) 'Neg. conc. for species ',i,' in bin ',j,' after cond.:',c_p(i,j),' cm^-3'
+            c_p(i,j) = c_p_backg(i,j)*1D-3
+          END IF
+        END DO
+        
         vp_dry(j)=SUM(c_p(index_dry,j)/Na*MX(index_dry)/qX(index_dry)/(N_bins(j)*1D-6)) ! m^3     
         vp_wet(j)=SUM(c_p(:,j)/Na*MX/qX/(N_bins(j)*1D-6)) ! m^3
         V_bins(j)=N_bins(j)*vp_wet(j)

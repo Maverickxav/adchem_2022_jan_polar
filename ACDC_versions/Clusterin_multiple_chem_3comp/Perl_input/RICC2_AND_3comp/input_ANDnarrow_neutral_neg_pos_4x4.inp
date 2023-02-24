@@ -1,0 +1,98 @@
+#								sulfuric_acid	bisulfate_ion	ammonia			dimethylamine	proton
+name:							A				B				N				D				P
+charge:							0				-1				0				0 				1
+corresponding neutral molecule:	-				A				-				-				-
+corresponding negative ion:		B				-				-				-				-
+corresponding positive ion:		-				-				1N1P			1D1P			-
+mass [g/mol]:					98.08			97.08			17.04			45.08			1.00
+density [kg/m**3]:              1830.0			1830.0			696.0			680.0			-
+base strength:					-1				3				1				2				-1
+acid strength:					2				-1				-1				-1				3
+########################################################################################################
+# Electrically neutral clusters:
+# A clusters
+								1-4				0				0				0				0
+# AN clusters
+								0-4				0				1				0				0
+								0-4				0				2				0				0
+								1-4				0				3				0				0
+								2-4				0				4				0				0
+# Criteria for growing out of the simulation:
+out neutral						5				0				4				0				0
+#############
+# AD clusters
+								0-4				0				0				1				0
+								0-4				0				0				2				0
+								1-4				0				0				3				0
+								2-4				0				0				4				0
+# Criteria for growing out of the simulation:
+out neutral						5				0				0				4				0
+out neutral						4				0				0				5				0
+#############
+# AND clusters
+								0-4				0				1				1				0
+								1-4				0				2				1				0
+								1-4				0				1				2				0
+								2-4				0				3				1				0
+								2-4				0				2				2				0
+								2-4				0				1				3				0
+# Criteria for growing out of the simulation:
+out neutral						5				0				3				1				0
+out neutral						5				0				2				2				0
+out neutral						5				0				1				3				0
+########################################################################################################
+# Negative clusters:
+# A clusters
+								0-3				1				0				0				0
+# AN clusters
+								0-3				1				1				0				0
+								0-3				1				2				0				0
+								3				1				3				0				0
+# Criteria for growing out of the simulation:
+out negative					4				1				2				0				0
+#############
+# AD clusters
+								0-3				1				0				1				0
+								0-3				1				0				2				0
+								2-3				1				0				3				0
+								3				1				0				4				0
+# Criteria for growing out of the simulation:
+out negative					4				1				0				2				0
+#############
+# AND clusters
+								0-3				1				1				1				0
+								2-3				1				2				1				0
+								2-3				1				1				2				0
+# Criteria for growing out of the simulation:
+out negative					4				1				1				1				0
+########################################################################################################
+# Positive clusters:
+# AN clusters
+								0-2				0				1				0				1
+								0-3				0				2				0				1
+								0-4				0				3				0				1
+								2-4				0				4				0				1
+# Criteria for growing out of the simulation:
+out positive					4				0				5				0				1
+#############
+# AD clusters
+								0-2				0				0				1				1
+								0-2				0				0				2				1
+								0-4				0				0				3				1
+								2-4				0				0				4				1
+# Criteria for growing out of the simulation:
+out positive					3				0				0				5				1
+#############
+# AND clusters
+								0-2				0				1				1				1
+								0-3				0				2				1				1
+								0-3				0				1				2				1
+								2-4				0				3				1				1
+								2-4				0				2				2				1
+								2-4				0				1				3				1
+# Criteria for growing out of the simulation:
+out positive					4				0				4				1				1
+out positive					4				0				3				2				1
+out positive					4				0				2				3				1
+out positive					4				0				1				4				1
+########################################################################################################
