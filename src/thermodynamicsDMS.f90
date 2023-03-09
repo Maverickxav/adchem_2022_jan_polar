@@ -49,12 +49,17 @@ REAL(dp), DIMENSION(2,12) :: ccai
 ! Combnined KHNO3*H_HNO3 from Table B7 in Jacobson (2005), Temperature dependence assigned to the Henry's law coefficient
 KHNO3=12D0! mol/kg HNO3(aq)<->H+ + NO3-
 H_HNO3=2.1D5*EXP(29.17*(298.15/T-1D0)+16.83*(1D0+LOG(298.15/T)-298.15/T))  !*EXP(8700D0*(1D0/T-1D0/298D0)) ! mol/(kg atm) Henry's law coeff for HNO3(g)<->HNO3(aq)
-K_3=H_HNO3*KHNO3 ! equilibrium constant HNO3(g) <-> H+ + NO3-
+K_3=H_HNO3*KHNO3 ! equilibrium constant HNO3(g) <-> H+ + NO3- equilibrium dissociation constant? 
+
+!! table B7
+! KHNO3=1.2D1*EXP(29.17*(298.15/T-1D0)+16.83*(1D0+LOG(298.15/T)-298.15/T))! mol/kg HNO3(aq)<->H+ + NO3-
+! K_3=2.51D6*EXP(29.17*(298.15/T-1D0)+16.83*(1D0+LOG(298.15/T)-298.15/T))  !mol2 kg−2 atm−1 *EXP(8700D0*(1D0/T-1D0/298D0)) ! mol/(kg atm) Henry's law coeff for HNO3(g)<->HNO3(aq)
+! H_HNO3=K_3/KHNO3 !mol kg^-1 atm^-1 equilibrium constant HNO3(g) <-> H+ + NO3- equilibrium dissociation constant? section 7.6.2 in seinfeld and pandis
 
 !KHCl and KHCl*H_HCl from Table B7 in Jacobson (2005)
 KHCl=1.72D6*EXP(23.15*(298.15/T-1D0)) ! 5D11 !*exp(6890.0*(1D0/T-1D0/298D0))/2.9D5 !1.72D6*EXP(23.15*(298./T-1D0)) ! mol/kg HCl(aq)<->H+ + Cl-
 K_4=1.97D6*EXP(30.19*(298.15/T-1D0)+19.91*(1D0+LOG(298.15/T)-298.15/T)) !HCl(g) <-> H+ + Cl- mol^2 kg^-2 atm^-1 
-H_HCl=K_4/KHCl !HCl(g)<->HCl(aq)
+H_HCl=K_4/KHCl !HCl(g)<->HCl(aq) mol kg^-1 atm^-1
 
 ! KCH3SO3H and H_CH3SO3H from COSMOTherm
 KCH3SO3H=855.0667*EXP(1980.5*(1D0/T-1D0/298.15D0))! COSMOTherm (Noora)
@@ -307,7 +312,7 @@ Hprim_CH3SO3H=MH2O*cw*Rprim*T*K_5/(mH*y_L(1,:)*yCH3SO3)  ! Assume yCH3SO3=1
 Hprim_HIO3=MH2O*cw*Rprim*T*K_6/(mH*y_L(1,:)*yHIO3)  ! Assume yHIO3=1
 
 
-Kprim_HNO3=Hprim_HNO3+H_HNO3*KHNO3*(MH2O*cw)**2D0*Rprim*T/(cH*y_L(1,:)*y_L(5,:))
+Kprim_HNO3=Hprim_HNO3+H_HNO3*KHNO3*(MH2O*cw)**2D0*Rprim*T/(cH*y_L(1,:)*y_L(5,:)) ! dimensionless
 Kprim_HCl=Hprim_HCl+H_HCl*KHCl*(MH2O*cw)**2D0*Rprim*T/(cH*y_L(1,:)*y_L(4,:)) 
 Kprim_CH3SO3H=Hprim_CH3SO3H+H_CH3SO3H*KCH3SO3H*(MH2O*cw)**2D0*Rprim*T/(cH*y_L(1,:)*yCH3SO3) ! Assume yCH3SO3=1
 Kprim_HIO3=Hprim_HIO3+H_HIO3*KHIO3*(MH2O*cw)**2D0*Rprim*T/(cH*y_L(1,:)*yHIO3) ! Assume yHIO3=1
@@ -317,7 +322,7 @@ K_2=1.03D11*EXP(34.81*(298./T-1D0)-5.39*(1D0+LOG(298./T)-298./T)) ! equilibrium 
 H_NH3=57.6*EXP(13.79*(298./T-1D0)-5.39*(1D0+LOG(298./T)-298./T)) ! mol/(kg atm) NH3(g)<->NH3(aq)
 K_NH3=K_2/H_NH3 ! kg/mol NH3(aq)+H+<->NH4+
 Hprim_NH3=H_NH3*Rprim*T*MH2O*cw ! mol/mol
-Kprim_NH3=K_NH3/(MH2O*cw)*y_L(1,:)/y_L(3,:) ! m^3/mol
+Kprim_NH3=K_NH3/(MH2O*cw)*y_L(1,:)/y_L(3,:) ! m^3/mol equation 17.122 jacobson 2005
 END SUBROUTINE thermodyn_AIOMFAC_inorg
 
 SUBROUTINE thermodyn_AIOMFAC_inorg_bulk(T,c_p_bulk,pCO2,pH_bulk,yi_bulk)

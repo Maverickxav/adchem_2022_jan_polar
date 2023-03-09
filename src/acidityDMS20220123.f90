@@ -128,7 +128,7 @@ Y6=J*KCH3SO3H+K*U
 
 CALL root_finder(alfa,mH)
 
-mHCO3=K5*K4*pCO2/mH
+mHCO3=K5*K4*pCO2/mH  ! seinfekd and pandis EQ. 7.2
 mCO3=K6*K5*K4*pCO2/(mH**2D0)
 mSO4=K1*yHSO4*mSVI/(K1*yHSO4+mH*yH*ySO4)
 mHSO4=mSVI-mSO4

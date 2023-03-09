@@ -7,10 +7,8 @@ SRCDIR = src
 CHEM_MAIN_DIR =	chemistries
 ACDC_MAIN_DIR = ACDC_versions
 
-CHEM_DIR=$(CHEM_MAIN_DIR)/mcm_PRAMv1_DMS_I2O5
-ACDC_DIR=$(ACDC_MAIN_DIR)/Clusterin_multiple_chem
-
-# ACDC_DIR=Clusterin_multiple_chem_RICC2
+CHEM_DIR=$(CHEM_MAIN_DIR)/mcm_PRAMv1_DMS_I2O5_HIO2
+ACDC_DIR=$(ACDC_MAIN_DIR)/Clusterin_multiple_chem_MSA
 NAC := $(shell find ${ACDC_DIR}/cluster_chem_* -maxdepth 0 -type d |wc -l|sed 's/ //g')
 
 CLUSTER_CHEM_NUM := $(shell seq $(NAC))
@@ -22,7 +20,10 @@ VPATH = $(OBJDIR):src:$(CHEM_DIR):megan:$(foreach n,$(CLUSTER_CHEM_NUM),$(ACDC_D
 # When compiling, search for files in these directories:
 # VPATH = $(OBJDIR): mcm_PRAMv1_DMS megan ACDC_module_ions_2018_08_31 ACDC_module_2016_09_23
 # VPATH = $(OBJDIR):chemistry_biogenic megan
-NETCDF=/opt/local
+# NETCDF=/opt/local
+# NETLIBS = -I/opt/local/include -L/opt/local/lib -L/usr/lib -lnetcdff -lnetcdf -lcurl -lhdf5 -lhdf5_hl
+NETLIBS = -I/opt/local/include -L/opt/local/lib -lnetcdff -L/opt/local/lib -Wl,-headerpad_max_install_names -Wl,-rpath,/opt/local/lib/libgcc \
+			-Wl,-syslibroot,/Library/Developer/CommandLineTools/SDKs/MacOSX12.sdk -arch arm64 -lnetcdf -lnetcdf -lm -lcurl -lhdf5 -lhdf5_hl
 # Options reminders:
 # -w suppresses warning messages
 
@@ -37,11 +38,11 @@ NETCDF=/opt/local
 # OPTS = -ffree-line-length-none -cpp -J$(OBJDIR) -I$(OBJDIR) -fcheck=all -ffpe-trap=invalid,zero,overflow -Os 
 #OPTS = -ffree-line-length-none -cpp -J$(OBJDIR) -I$(OBJDIR) -fcheck=all -Wall -Wextra -g -O0 -ffpe-trap=invalid,zero,overflow -fbounds-check
 # For programming (faster compiling):
-OPTS1 = -ffree-line-length-none -cpp -I$(NETCDF)/include -J$(OBJDIR) -I$(OBJDIR) -fcheck=all -ffpe-trap=invalid,zero,overflow 
+OPTS1 = -ffree-line-length-none -cpp -J$(OBJDIR) -I$(OBJDIR) -fcheck=all -ffpe-trap=invalid,zero,overflow 
 
 #this runs 2x faster, but slower compilation
 # OPTS = -ffree-line-length-none -cpp -I$(NETCDF)/include -J$(OBJDIR) -I$(OBJDIR) -fcheck=all -ffpe-trap=invalid,zero,overflow -Os 
-OPTS = -ffree-line-length-none -cpp -I$(NETCDF)/include -J$(OBJDIR) -I$(OBJDIR) -fcheck=all -ffpe-trap=invalid,zero,overflow -Os	
+OPTS = -ffree-line-length-none -cpp -J$(OBJDIR) -I$(OBJDIR) -fcheck=all -ffpe-trap=invalid,zero,overflow -O3	
 # OPT = -ffpe-trap=invalid,zero,overflow
 
 CHEM_OPTS = $(OPTS1)
@@ -74,7 +75,7 @@ all: adchem1D.exe
 # Here is the link step:
 
 adchem1D.exe: adchem1D.o $(MAIN_OBJECTS) $(CHEM_OBJECTS) $(MEGAN_OBJECTS) $(ACDC_OBJECTS) 
-	 $(F90) $(OPTS1) $^ -o $@
+	 $(F90) $(OPTS1) $(NETLIBS) $^ -o $@ 
 
 # Here are the compile steps:
 
@@ -82,8 +83,8 @@ adchem1D.exe: adchem1D.o $(MAIN_OBJECTS) $(CHEM_OBJECTS) $(MEGAN_OBJECTS) $(ACDC
 
 
 
-$(OBJDIR)/adchem1D.o: adchem1D_clustering.f90 $(MAIN_OBJECTS) $(CHEM_OBJECTS) $(MEGAN_OBJECTS) $(ACDC_OBJECTS) 
-	 $(F90) $(OPTS1) -c $< -o $@
+$(OBJDIR)/adchem1D.o: adchem1D_v1.f90 $(MAIN_OBJECTS) $(CHEM_OBJECTS) $(MEGAN_OBJECTS) $(ACDC_OBJECTS) 
+	 $(F90) $(OPTS1) $(NETLIBS) -c $< -o $@
 
 
 $(OBJDIR)/reaction_rates.o: reaction_rates_20220118.f90 constants.o $(CHEM_OBJECTS) 
@@ -92,22 +93,22 @@ $(OBJDIR)/reaction_rates.o: reaction_rates_20220118.f90 constants.o $(CHEM_OBJEC
 $(OBJDIR)/thermodynamics.o: thermodynamicsDMS.f90 constants.o acidity.o $(CHEM_OBJECTS)
 	 $(F90) $(OPTS) -c $< -o $@	 
 	 
-$(OBJDIR)/dynamics.o: dynamicsDMS_atm_clusterin.f90 constants.o acdc_datatypes.o $(CHEM_OBJECTS)
+$(OBJDIR)/dynamics.o: dynamicsDMS_atm_v1.f90 constants.o acdc_datatypes.o $(CHEM_OBJECTS)
 	 $(F90) $(OPTS) -c $< -o $@	 
 
 $(OBJDIR)/diffusivity.o: diffusivity.f90 constants.o $(CHEM_OBJECTS)
 	 $(F90) $(OPTS) -c $< -o $@	 	 
 
-$(OBJDIR)/constants.o: constants.f90 $(CHEM_OBJECTS)
+$(OBJDIR)/constants.o: constants_v1.f90 $(CHEM_OBJECTS)
 	 $(F90) $(OPTS) -c $< -o $@
 
 $(OBJDIR)/acidity.o: acidityDMS.f90 $(CHEM_OBJECTS)
 	 $(F90) $(OPTS) -c $< -o $@
 
-$(OBJDIR)/output.o: output.f90 constants.o $(CHEM_OBJECTS)
-	 $(F90) $(OPTS) -c $< -o $@
+$(OBJDIR)/output.o: output_netcdf.f90 constants.o $(CHEM_OBJECTS)
+	 $(F90) $(OPTS) $(NETLIBS) -c $< -o $@
 
-$(OBJDIR)/cluster_plugin.o: clustering_module.f90 acdc_datatypes.o $(ACDC_OBJECTS)
+$(OBJDIR)/cluster_plugin.o: clustering_module_v1.f90 acdc_datatypes.o $(ACDC_OBJECTS)
 	 $(F90) $(OPTS) -c $< -o $@	 
 
 $(OBJDIR)/acdc_datatypes.o: acdc_datatypes.f90 $(CHEM_OBJECTS)
@@ -251,7 +252,7 @@ clean:
 	-@rm $(ACDC_OBJECTS)  $(ACDC_MODS)         2>/dev/null || true
 	-@cd $(OBJDIR) ; rm adchem1D.o  $(MAIN_OBJECTS) $(MEGAN_OBJECTS) $(MAIN_MODS) $(MEGAN_MODS) 2>/dev/null || true
 	-@cd $(OBJDIR) ; rm aciditydms* driver_acdc_j* clusterin_plugin* dynamicsdms_atm* reaction_rates* thermodynamics*  2>/dev/null || true
-	-@rm adchem1D.exe                                                 2>/dev/null || true
+	-@rm *adchem1D.exe                                                 2>/dev/null || true
 
 # With 'clean', don't remove chemistry object files, since it takes very long (minutes, or tens of minutes if big chemistry)
 # to compile them, and there usually is no need to recompile them
@@ -261,7 +262,7 @@ clean:
 cleanall:
 	-@cd $(OBJDIR) ; rm $(MAIN_OBJECTS) $(CHEM_OBJECTS) $(CHEM_MODS) $(MEGAN_OBJECTS) $(ACDC_OBJECTS)    2>/dev/null || true
 	-@cd $(OBJDIR) ; rm adchem1D.o                                    2>/dev/null || true
-	-@rm adchem1D.exe                                                 2>/dev/null || true
+	-@rm *adchem1D.exe                                                 2>/dev/null || true
 	-@rm $(OBJDIR)/*                                                  2>/dev/null || true
 
 # Some explanation for the clean commands:

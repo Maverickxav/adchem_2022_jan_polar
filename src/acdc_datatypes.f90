@@ -29,8 +29,8 @@ module acdc_datatypes
     
     REAL(DP),allocatable                   :: Nconc_evap(:)
     REAL(DP),allocatable                   :: conc_out_all(:), comp_out_all(:,:) ! Concentrations and compositions of individual outgrown clusters (optional) clust_out_molec=nclust,number of vapors 
-                                                                                          !  conc_out_all =nclust_molec
-    INTEGER, ALLOCATABLE                   :: clust_out_molec(:,:)
+                                                                                           !  conc_out_all =nclust_molec
+    INTEGER, ALLOCATABLE                   :: clust_out_molec(:,:)   !!! nclust, nvapors: composition of vapor in each cluster
     INTEGER, ALLOCATABLE                   :: ind_out_bin(:)
 
   
