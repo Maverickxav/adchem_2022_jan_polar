@@ -5,10 +5,10 @@ F90 = /usr/local/bin/gfortran
 OBJDIR = build
 SRCDIR = src
 CHEM_MAIN_DIR =	chemistries
-ACDC_MAIN_DIR = ACDC_versions
+ACDC_MAIN_DIR = ACDC
 
 CHEM_DIR=$(CHEM_MAIN_DIR)/mcm_PRAMv1_DMS_I2O5_HIO2
-ACDC_DIR=$(ACDC_MAIN_DIR)/Clusterin_multiple_chem_MSA
+ACDC_DIR=$(ACDC_MAIN_DIR)/Clusterin_multiple_chem_5sys
 NAC := $(shell find ${ACDC_DIR}/cluster_chem_* -maxdepth 0 -type d |wc -l|sed 's/ //g')
 
 CLUSTER_CHEM_NUM := $(shell seq $(NAC))
@@ -75,16 +75,14 @@ all: adchem1D.exe
 # Here is the link step:
 
 adchem1D.exe: adchem1D.o $(MAIN_OBJECTS) $(CHEM_OBJECTS) $(MEGAN_OBJECTS) $(ACDC_OBJECTS) 
-	 $(F90) $(OPTS1) $(NETLIBS) $^ -o $@ 
+	 $(F90)  $(OPTS1) $(NETLIBS) $^ -o $@ 
 
 # Here are the compile steps:
 
 # Main program
 
-
-
 $(OBJDIR)/adchem1D.o: adchem1D_v1.f90 $(MAIN_OBJECTS) $(CHEM_OBJECTS) $(MEGAN_OBJECTS) $(ACDC_OBJECTS) 
-	 $(F90) $(OPTS1) $(NETLIBS) -c $< -o $@
+	 $(F90)  $(OPTS1) $(NETLIBS) -c $< -o $@
 
 
 $(OBJDIR)/reaction_rates.o: reaction_rates_20220118.f90 constants.o $(CHEM_OBJECTS) 
@@ -108,7 +106,7 @@ $(OBJDIR)/acidity.o: acidityDMS.f90 $(CHEM_OBJECTS)
 $(OBJDIR)/output.o: output_netcdf.f90 constants.o $(CHEM_OBJECTS)
 	 $(F90) $(OPTS) $(NETLIBS) -c $< -o $@
 
-$(OBJDIR)/cluster_plugin.o: clustering_module_v1.f90 acdc_datatypes.o $(ACDC_OBJECTS)
+$(OBJDIR)/cluster_plugin.o: clustering_module_v2.f90 acdc_datatypes.o $(ACDC_OBJECTS)
 	 $(F90) $(OPTS) -c $< -o $@	 
 
 $(OBJDIR)/acdc_datatypes.o: acdc_datatypes.f90 $(CHEM_OBJECTS)

@@ -6,11 +6,11 @@ implicit none
     integer, parameter :: max_eq_solver = 5000             ! (Set to a high number just to favor the solver; should probably be decreased)
     
     ! Relative tolerance in the solver or when assessing the Euler solutions (see driver)
-    real(kind(1.d0)), parameter :: rtol_solver = 1.d-5
+    real(kind(1.d0)), parameter :: rtol_solver = 1.d-3
     !real(kind(1.d0)), parameter :: rtol_solver = 1.d-3    ! 1.d-3 is the default tolerance e.g. in Matlab
     
     ! Settings for a solver
-    real(kind(1.d0)), parameter :: atol_solver = 1.d-20    ! Absolute tolerance in the solver
+    real(kind(1.d0)), parameter :: atol_solver = 1.d-10!1.d-20    ! Absolute tolerance in the solver
     
     ! Settings for Euler integration
     real(kind(1.d0)), parameter :: chmax = 1.d-2           ! Threshold relative change in the concentration for

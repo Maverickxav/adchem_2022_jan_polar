@@ -2059,7 +2059,7 @@ END SUBROUTINE condensation
         IF (N_bins(j)<1D-6) THEN ! This can occur with the full-stationary method if some particles grow to more than the next particle size bin within one condensation time step
           N_bins(j)=1D-3		
           c_p(:,j)=c_p_backg(:,j)*1D-3;       
-          ! c_p(:,j)=c_p(:,j)*vp_fixed(j)/SUM(c_p(index_dry,j)/Na*MX(index_dry)/qX(index_dry))*N_bins(j)*1D-6   
+          c_p(:,j)=c_p(:,j)*vp_fixed(j)/SUM(c_p(index_dry,j)/Na*MX(index_dry)/qX(index_dry))*N_bins(j)*1D-6   
         END IF
        
         vp_dry(j)=SUM(c_p(index_dry,j)/Na*MX(index_dry)/qX(index_dry)/(N_bins(j)*1D-6)) ! m^3     

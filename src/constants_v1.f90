@@ -72,7 +72,7 @@ MODULE constants
     !INTEGER, PARAMETER :: index_measured_gases = 1 ! IF 1 run with the measured O3, NOx and SO2 as input for the model               
     
     !!! netcdf output related stuff
-    integer, parameter :: nr_outputs=14 
+    integer, parameter :: nr_outputs=15 
     integer, parameter :: days_upwind_save=4 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

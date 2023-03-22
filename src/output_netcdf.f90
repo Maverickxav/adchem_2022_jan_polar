@@ -13,7 +13,7 @@ MODULE output
 CONTAINS
     
     SUBROUTINE open_write_nc_files(openfname,writefname,closefile, ncids,general_ids,increment,RH,TEMP,pressure, species_names, time, conc,psat,&
-                                    N_bins, pH, conc_pp, Jnucl_N, Jnucl_D, Jnucl_I, Jnucl_M, CS_H2SO4)
+                                    N_bins, pH, conc_pp, Jnucl_N, Jnucl_D, Jnucl_I, Jnucl_M, Jnucl_AND, CS_H2SO4)
         implicit NONE
 
         integer :: status
@@ -27,7 +27,7 @@ CONTAINS
         integer :: dt_id, nz_id, nbins_id, nspec_id, ncond_id, nspecp_id
         integer ::jnh3_id,jdma_id, jmsa_id, jhio3_id 
         integer ::rh_id,temp_id, cond_index_id, molar_mass_id, ph_id, psat_id, spec_name_id, dens_id, pres_id, time_id, conc_id
-        integer ::nconc_id,jnucl_n_id,jnucl_d_id,jnucl_i_id,jnucl_m_id,cs_id, concpp_id
+        integer ::nconc_id,jnucl_n_id,jnucl_d_id,jnucl_i_id,jnucl_m_id,jnucl_and_id, cs_id, concpp_id
         logical, intent(in):: openfname, writefname, closefile
         integer, intent(in), optional:: increment
         REAL(dp), DIMENSION(Nz), INTENT(in), optional :: RH,TEMP, pressure
@@ -38,7 +38,7 @@ CONTAINS
         REAL(dp), DIMENSION(NCOND), INTENT(in), optional :: psat
         REAL(dp), DIMENSION(Nz,nr_bins), INTENT(in), optional :: N_bins,pH
         REAL(dp), DIMENSION(Nz,NSPEC_P,nr_bins), INTENT(in), optional :: conc_pp
-        REAL(dp), DIMENSION(Nz), INTENT(in), optional :: Jnucl_N,Jnucl_D, Jnucl_I,Jnucl_M, CS_H2SO4
+        REAL(dp), DIMENSION(Nz), INTENT(in), optional :: Jnucl_N,Jnucl_D, Jnucl_I,Jnucl_M, Jnucl_AND, CS_H2SO4
 
 
         
@@ -127,6 +127,7 @@ CONTAINS
                         call check( nf90_def_var(ncids(i), 'Jnucl_AD', NF90_FLOAT, [nz_id,dt_id], jnucl_d_id),'def_var' )
                         call check( nf90_def_var(ncids(i), 'Jnucl_IiIo', NF90_FLOAT, [nz_id,dt_id], jnucl_i_id),'def_var' )
                         call check( nf90_def_var(ncids(i), 'Jnucl_AMsD', NF90_FLOAT, [nz_id,dt_id], jnucl_m_id),'def_var' )
+                        call check( nf90_def_var(ncids(i), 'Jnucl_AND', NF90_FLOAT, [nz_id,dt_id], jnucl_and_id),'def_var' )
                         call check( nf90_def_var(ncids(i), 'CS_H2SO4', NF90_FLOAT, [nz_id,dt_id], cs_id),'def_var' )
                         call check( nf90_def_var(ncids(i), 'conc_pp', NF90_FLOAT, [nz_id,nspecp_id, nbins_id, dt_id], concpp_id),'def_var' )
                         call check( nf90_def_var(ncids(i), 'pH', NF90_FLOAT, [nz_id, nbins_id, dt_id], ph_id),'def_var' )
@@ -139,13 +140,14 @@ CONTAINS
                         call check( nf90_put_att(ncids(i), jnucl_d_id, 'units', '[#/m^3]'), 'jnucl_d')
                         call check( nf90_put_att(ncids(i), jnucl_i_id, 'units', '[#/m^3]'), 'jnucl_i')
                         call check( nf90_put_att(ncids(i), jnucl_m_id, 'units', '[#/m^3]'), 'jnucl_m')
+                        call check( nf90_put_att(ncids(i), jnucl_and_id, 'units', '[#/m^3]'), 'jnucl_and')
                         call check( nf90_put_att(ncids(i), cs_id, 'units', '[s-1]'), 'CS_H2SO4')
                         call check( nf90_put_att(ncids(i), concpp_id, 'units', '[#/cm^3]'), 'CS_H2SO4')
                         call check( nf90_put_att(ncids(i), pH_id, 'units', '[ ]'), 'pH')
 
                         call check( nf90_enddef(ncids(i)) )  
 
-                        general_ids(7:14)=(/nconc_id,jnucl_n_id,jnucl_d_id, jnucl_i_id, jnucl_m_id, cs_id, concpp_id, ph_id/)
+                        general_ids(7:15)=(/nconc_id,jnucl_n_id,jnucl_d_id, jnucl_i_id, jnucl_m_id, jnucl_and_id, cs_id, concpp_id, ph_id/)
                         
                     elseif (writefname) THEN
                             ! write(*,*) 'L54:', ncids(i), general_ids(1), openfname, writefname,i
@@ -154,9 +156,10 @@ CONTAINS
                             call check( nf90_put_var(ncids(i), general_ids(9),Jnucl_D,start=(/1,increment/), count=(/nz/) )         ,'write-jnucl_d' )
                             call check( nf90_put_var(ncids(i), general_ids(10),Jnucl_I,start=(/1,increment/), count=(/nz/) )        ,'write-jnucl_i' )
                             call check( nf90_put_var(ncids(i), general_ids(11),Jnucl_M,start=(/1,increment/), count=(/nz/) )        ,'write-jnucl_m' )
-                            call check( nf90_put_var(ncids(i), general_ids(12),CS_H2SO4,start=(/1,increment/), count=(/nz/) )       ,'write-CS_H2SO4' )
-                            call check( nf90_put_var(ncids(i), general_ids(13),conc_pp,start=(/1,1,1, increment/), count=(/nz, NSPEC_P, nr_bins,1/) ),'write-conc_pp' )
-                            call check( nf90_put_var(ncids(i), general_ids(14),pH,start=(/1,1, increment/), count=(/nz, nr_bins,1/) ) ,'write-pH' )
+                            call check( nf90_put_var(ncids(i), general_ids(12),Jnucl_AND,start=(/1,increment/), count=(/nz/) )        ,'write-jnucl_AND' )
+                            call check( nf90_put_var(ncids(i), general_ids(13),CS_H2SO4,start=(/1,increment/), count=(/nz/) )       ,'write-CS_H2SO4' )
+                            call check( nf90_put_var(ncids(i), general_ids(14),conc_pp,start=(/1,1,1, increment/), count=(/nz, NSPEC_P, nr_bins,1/) ),'write-conc_pp' )
+                            call check( nf90_put_var(ncids(i), general_ids(15),pH,start=(/1,1, increment/), count=(/nz, nr_bins,1/) ) ,'write-pH' )
                     end if    
                 end if
 

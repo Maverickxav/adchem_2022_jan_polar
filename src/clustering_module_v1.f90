@@ -33,6 +33,8 @@ subroutine allocate_chem_dimensions(chem_v, MX_v,qX_v, c_clusters,c_clusters_v, 
         call get_system_size_3(neq_syst=chem_v%neq_syst)
     elseif (kk.eq.4) then
         call get_system_size_4(neq_syst=chem_v%neq_syst)
+    elseif (kk.eq.5) then
+        call get_system_size_4(neq_syst=chem_v%neq_syst)
     end if
 
     allocate(c_clusters(nz,chem_v%neq_syst))
